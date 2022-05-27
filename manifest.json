@@ -1,0 +1,20 @@
+{
+  "name": "Tyrian QoL",
+  "version": "0.0.1",
+  "namespace": "Kenedia.Modules.QoL",
+  "package": "QoL.dll",
+  "manifest_version": 1,
+
+  "description": "A collection of smaller Quality of Life features!",
+  "dependencies": {
+    "bh.blishhud": ">=0.11.7"
+  },
+  "url": "https://github.com/KenediaDev/QoL.git",
+  "contributors": [
+    {
+      "url": "https://github.com/KenediaDev",
+      "name": "Kenedia"
+    }
+  ],
+  "enabled_without_gw2": false,
+}
