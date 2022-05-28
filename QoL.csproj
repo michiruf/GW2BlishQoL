@@ -81,6 +81,7 @@
     <Compile Include="SubModules\ItemDesctruction\ItemDesctruction.cs" />
     <Compile Include="SubModules\SkipCutscenes\SkipCutscenes.cs" />
     <Compile Include="SubModules\ZoomOut\ZoomOut.cs" />
+    <Compile Include="UI\Hotbar.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="AsyncClipboardService, Version=1.7.1.0, Culture=neutral, processorArchitecture=MSIL">

@@ -1,4 +1,5 @@
 ﻿using Blish_HUD.Content;
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +22,14 @@ namespace Kenedia.Modules.QoL
         public static Point Scale(this Point p, double factor)
         {
             return new Point((int)(p.X * factor), (int)(p.Y * factor));
+        }
+    }
+
+    internal static class RectangleExtensions
+    {
+        public static string ConvertToString(this Rectangle r)
+        {
+            return string.Format("X: {0}, Y: {1}, Width: {2}, Height: {3}", r.Left, r.Top, r.Width, r.Height);
         }
     }
 

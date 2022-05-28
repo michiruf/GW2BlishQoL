@@ -57,11 +57,6 @@ namespace Kenedia.Modules.QoL.SubModules
                                                       new Blish_HUD.Input.KeyBinding(ModifierKeys.Ctrl, Keys.Delete),
                                                       () => string.Format(Strings.common.Toggle, Name));
 
-            ShowCornerIcon = settings.DefineSetting(Name + nameof(ShowCornerIcon),
-                                                      true,
-                                                      () => string.Format(Strings.common.ShowCorner_Name, Name),
-                                                      () => string.Format(Strings.common.ShowCorner_Tooltip, Name));
-
             var internal_settings = settings.AddSubCollection(Name + " Internal Settings", false, false);
             Cancel_Key = internal_settings.DefineSetting(Name + nameof(Cancel_Key), new Blish_HUD.Input.KeyBinding(Keys.Escape));
 
@@ -70,9 +65,7 @@ namespace Kenedia.Modules.QoL.SubModules
             Cancel_Key.Value.Activated += Cancel_Key_Activated;
 
             ToggleModule_Key.Value.Enabled = true;
-            ToggleModule_Key.Value.Activated += ToggleModule_Key_Activated;
-
-            ShowCornerIcon.SettingChanged += ShowCornerIcon_SettingChanged;
+            ToggleModule_Key.Value.Activated += ToggleModule_Key_Activated;            
         }
 
         private void ToggleModule_Key_Activated(object sender, EventArgs e)
@@ -85,20 +78,11 @@ namespace Kenedia.Modules.QoL.SubModules
             base.ToggleModule();
 
             CursorIcon.Visible = Active;
-            LoadingSpinner.Visible = CornerIcon?.Visible == true && Active;
         }
 
         public override void Initialize()
         {
             base.Initialize();
-
-            LoadingSpinner = new LoadingSpinner()
-            {
-                Parent = GameService.Graphics.SpriteScreen,
-                Size = CornerIcon.Size,
-                Visible = false,
-                Location = new Point(CornerIcon.Location.X, CornerIcon.Location.Y + CornerIcon.Height + 5),
-            };
 
             CursorIcon = new CursorSpinner()
             {
@@ -106,6 +90,7 @@ namespace Kenedia.Modules.QoL.SubModules
                 Parent = GameService.Graphics.SpriteScreen,
                 Background = QoL.ModuleInstance.TextureManager.getBackground(_Backgrounds.Tooltip),
                 Visible = false,
+                Instruction = Strings.common.ClickItem,
             };
 
             string[] instructions = {
@@ -130,17 +115,6 @@ namespace Kenedia.Modules.QoL.SubModules
                 ClipsBounds = false,
             };
 
-            CornerIcon.Moved += CornerIcon_Moved;
-        }
-
-        private void ShowCornerIcon_SettingChanged(object sender, ValueChangedEventArgs<bool> e)
-        {
-            if (LoadingSpinner != null) LoadingSpinner.Visible = CornerIcon?.Visible == true && Active;
-        }
-
-        private void CornerIcon_Moved(object sender, MovedEventArgs e)
-        {
-            LoadingSpinner.Location = new Point(CornerIcon.Location.X, CornerIcon.Location.Y + CornerIcon.Height + 5);
         }
 
         public override void LoadData()
@@ -200,7 +174,7 @@ namespace Kenedia.Modules.QoL.SubModules
 
                 MouseState = mouse.LeftButton;
             }
-            
+
         }
         public override void UpdateLanguage(object sender, EventArgs e)
         {
@@ -224,14 +198,17 @@ namespace Kenedia.Modules.QoL.SubModules
         }
         public override void Dispose()
         {
-            base.Dispose();
-
             LoadingSpinner?.Dispose();
             CursorIcon?.Dispose();
             DeleteIndicator?.Dispose();
 
+            Cancel_Key.Value.Enabled = false;
             Cancel_Key.Value.Activated -= Cancel_Key_Activated;
-            ShowCornerIcon.SettingChanged -= ShowCornerIcon_SettingChanged;
+
+            ToggleModule_Key.Value.Enabled = false;
+            ToggleModule_Key.Value.Activated -= ToggleModule_Key_Activated;
+
+            base.Dispose();
         }
     }
 }

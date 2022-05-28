@@ -22,6 +22,8 @@ namespace Kenedia.Modules.QoL
         ModuleIcon_Active,
         ModuleIcon_Active_Hovered,
         ModuleIcon_Active_HoveredWhite,
+        Expand,
+        Expand_Hovered,
     }
     public enum _Emblems
     {
@@ -31,6 +33,7 @@ namespace Kenedia.Modules.QoL
     {
         MainWindow,
         Tooltip,
+        No3,
     }
 
     public class TextureManager : IDisposable

@@ -45,11 +45,6 @@ namespace Kenedia.Modules.QoL.SubModules
                                                       () => Strings.common.ManualMaxZoomOut_Name,
                                                       () => Strings.common.ManualMaxZoomOut_Tooltip);
 
-            ShowCornerIcon = settings.DefineSetting(Name + nameof(ShowCornerIcon),
-                                                      true,
-                                                      () => string.Format(Strings.common.ShowCorner_Name, Name),
-                                                      () => string.Format(Strings.common.ShowCorner_Tooltip, Name));
-
             ManualMaxZoomOut.Value.Enabled = true;
             ManualMaxZoomOut.Value.Activated += ManualMaxZoomOut_Triggered;
 
@@ -125,10 +120,10 @@ namespace Kenedia.Modules.QoL.SubModules
         }
         public override void Dispose()
         {
-            base.Dispose();
-
             ToggleModule_Key.Value.Activated -= ToggleModule_Key_Activated;
             ManualMaxZoomOut.Value.Activated -= ManualMaxZoomOut_Triggered;
+
+            base.Dispose();
         }
     }
 }

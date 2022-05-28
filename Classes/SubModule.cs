@@ -1,6 +1,7 @@
 ﻿using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Settings;
+using Kenedia.Modules.QoL.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -32,29 +33,21 @@ namespace Kenedia.Modules.QoL.Classes
         public bool Active;
         public bool Include;
 
-        protected Texture2D ModuleIcon;
-        protected Texture2D ModuleIconHovered;
-        protected Texture2D ModuleIcon_Active;
-        protected Texture2D ModuleIconHovered_Active;
+        public Texture2D ModuleIcon;
+        public Texture2D ModuleIconHovered;
+        public Texture2D ModuleIcon_Active;
+        public Texture2D ModuleIconHovered_Active;
 
         public event EventHandler Toggled;
 
         public SettingEntry<Blish_HUD.Input.KeyBinding> ToggleModule_Key;
-        public SettingEntry<bool> ShowCornerIcon;
 
         public Ticks Ticks = new Ticks();
+        public Hotbar_Button Hotbar_Button;
 
         public virtual void Initialize() 
         {
-            CornerIcon = new CornerIcon()
-            {
-                Icon = ModuleIcon,
-                HoverIcon = ModuleIconHovered,
-                BasicTooltipText = string.Format(Strings.common.Toggle, $"{Name}"),
-                Parent = GameService.Graphics.SpriteScreen,
-                Visible = true,
-            };
-            CornerIcon.Click += CornerIcon_Click;        
+            
         }
 
         public abstract void DefineSettings(SettingCollection parentSettings);
@@ -71,27 +64,20 @@ namespace Kenedia.Modules.QoL.Classes
 
             ScreenNotification.ShowNotification(string.Format(Strings.common.RunStateChange, Name, !Active ? Strings.common.Deactivated : Strings.common.Activated), ScreenNotification.NotificationType.Warning);
 
-            if (CornerIcon != null)
-            {
-                CornerIcon.Icon = Active ? ModuleIcon_Active : ModuleIcon;
-                CornerIcon.HoverIcon = Active ? ModuleIconHovered_Active : ModuleIconHovered;
-            }
-
             this.Toggled?.Invoke(this, EventArgs.Empty);
         }
 
         public abstract void Update(GameTime gameTime);
         public virtual void UpdateLanguage(object sender, EventArgs e)
         {
-            if (CornerIcon != null)
+            if (Hotbar_Button != null)
             {
-                CornerIcon.BasicTooltipText = string.Format(Strings.common.Toggle, $"{Name}");
+                Hotbar_Button.BasicTooltipText = string.Format(Strings.common.Toggle, $"{Name}");
             }
         }
         public virtual void Dispose()
         {
             QoL.ModuleInstance.LanguageChanged -= UpdateLanguage;
-            CornerIcon?.Dispose();
 
             ModuleIcon = null;
             ModuleIconHovered = null;

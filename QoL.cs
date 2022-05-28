@@ -7,6 +7,7 @@ using Blish_HUD.Settings;
 using Gw2Sharp.WebApi.V2.Models;
 using Kenedia.Modules.QoL.Classes;
 using Kenedia.Modules.QoL.SubModules;
+using Kenedia.Modules.QoL.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -58,8 +59,11 @@ namespace Kenedia.Modules.QoL
         public Ticks Ticks;
 
         public WindowBase2 MainWindow;
+        public Hotbar Hotbar;
 
-        public List<SubModule> Modules = new List<SubModule>();
+        public List<SubModule> Modules;
+
+        public SettingEntry<Blish_HUD.Input.KeyBinding> ReloadKey;
 
         private bool _DataLoaded;
         public bool FetchingAPI;
@@ -92,6 +96,16 @@ namespace Kenedia.Modules.QoL
                 var subSettings = settings.AddSubCollection(module.Name + " - Settings", true, false);
                 module.DefineSettings(subSettings);
             }
+
+
+            var internal_settings = settings.AddSubCollection("Internal Settings", false);
+            ReloadKey = internal_settings.DefineSetting(nameof(ReloadKey),
+                                                      new Blish_HUD.Input.KeyBinding(Keys.None),
+                                                      () => "Reload Button",
+                                                      () => "");
+
+            ReloadKey.Value.Enabled = true;
+            ReloadKey.Value.Activated += RebuildUI;
         }
 
         protected override void Initialize()
@@ -148,13 +162,20 @@ namespace Kenedia.Modules.QoL
 
         protected override void Unload()
         {
-            MainWindow?.Dispose();
+            foreach (SubModule module in Modules)
+            {
+                module.Dispose();
+            }
+            Modules.Clear();
+
+            DisposeUI();
 
             TextureManager.Dispose();
             TextureManager = null;
 
             DataLoaded_Event -= QoL_DataLoaded_Event;
             OverlayService.Overlay.UserLocale.SettingChanged -= UserLocale_SettingChanged;
+            ReloadKey.Value.Activated -= RebuildUI;
 
             DataLoaded = false;
             ModuleInstance = null;
@@ -168,6 +189,7 @@ namespace Kenedia.Modules.QoL
         async Task LoadData()
         {
 
+            DataLoaded = true;
         }
 
         private async void UserLocale_SettingChanged(object sender, ValueChangedEventArgs<Gw2Sharp.WebApi.Locale> e)
@@ -177,9 +199,38 @@ namespace Kenedia.Modules.QoL
             OnLanguageChanged(null, null);
         }
 
+        private void RebuildUI(object sender, EventArgs e)
+        {
+            ScreenNotification.ShowNotification("Rebuilding the UI", ScreenNotification.NotificationType.Warning);
+            DisposeUI();
+            CreateUI();
+        }
+
+        private void DisposeUI()
+        {
+            MainWindow?.Dispose();
+            Hotbar?.Dispose();
+        }
         private void CreateUI()
         {
+            Hotbar = new Hotbar()
+            {
+                Parent = GameService.Graphics.SpriteScreen,
+                Location = new Point(0, 34),
+                Size = new Point(36, 36),
+                ButtonSize = new Point(28, 28)
+            };
 
+            foreach (SubModule module in Modules)
+            {
+                module.Hotbar_Button = new Hotbar_Button()
+                {
+                    SubModule = module,
+                    BasicTooltipText = string.Format(Strings.common.Toggle, $"{module.Name}"),
+                };
+
+                Hotbar.AddButton(module.Hotbar_Button);
+            }
         }
     }
 }
