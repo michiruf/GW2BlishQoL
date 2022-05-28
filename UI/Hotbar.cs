@@ -20,8 +20,11 @@ namespace Kenedia.Modules.QoL.UI
 
         protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
         {
+            var texture = SubModule.Active ? SubModule.ModuleIcon_Active : SubModule.ModuleIcon;
+            if (MouseOver) texture = SubModule.Active ? SubModule.ModuleIconHovered_Active : SubModule.ModuleIconHovered;
+
             spriteBatch.DrawOnCtrl(this,
-                                SubModule.Active ? SubModule.ModuleIcon_Active : SubModule.ModuleIcon,
+                                texture,
                                 bounds,
                                 SubModule.ModuleIcon.Bounds,
                                 Color.White,
@@ -40,7 +43,6 @@ namespace Kenedia.Modules.QoL.UI
         protected override void DisposeControl()
         {
             base.DisposeControl();
-
             SubModule = null;
         }
     }
@@ -94,7 +96,7 @@ namespace Kenedia.Modules.QoL.UI
 
         private void SubModule_Toggled(object sender, EventArgs e)
         {
-            var active = SubControls.Where(btn => btn.SubModule.Active).Count();
+            var active = SubControls.Where(btn => btn.SubModule != null && btn.SubModule.Active).Count();
             FlowPanel.SortChildren<Hotbar_Button>((a, b) => (b.Visible.CompareTo(a.Visible)));
 
             Size = new Point(ExpanderSize.X + (active * ((int)(FlowPanel.ControlPadding.X) + ButtonSize.X)), Height);
@@ -104,7 +106,7 @@ namespace Kenedia.Modules.QoL.UI
         public void RemoveButton(Hotbar_Button btn)
         {
             if (SubControls.Contains(btn)) SubControls.Remove(btn);
-            btn.SubModule = null;
+            btn.SubModule.Toggled -= SubModule_Toggled;
             btn.Dispose();
         }
 
@@ -193,7 +195,14 @@ namespace Kenedia.Modules.QoL.UI
         protected override void DisposeControl()
         {
             base.DisposeControl();
-            SubControls?.DisposeAll();
+
+            foreach (Hotbar_Button btn in SubControls)
+            {
+                if(btn.SubModule != null) btn.SubModule.Toggled -= SubModule_Toggled;
+            }
+
+            SubControls?.Clear();
+            FlowPanel?.Dispose();
 
             Background = null;
         }

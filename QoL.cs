@@ -162,13 +162,13 @@ namespace Kenedia.Modules.QoL
 
         protected override void Unload()
         {
+            DisposeUI();
             foreach (SubModule module in Modules)
             {
                 module.Dispose();
             }
             Modules.Clear();
 
-            DisposeUI();
 
             TextureManager.Dispose();
             TextureManager = null;
