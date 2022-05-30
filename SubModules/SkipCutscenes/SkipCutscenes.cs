@@ -27,6 +27,7 @@ namespace Kenedia.Modules.QoL.SubModules
             Clicked,
             MouseMovedBack,
             Clicked_Again,
+            Menu_Opened,
             Menu_Closed,
             Done,
         }
@@ -224,17 +225,33 @@ namespace Kenedia.Modules.QoL.SubModules
 
                     else if (CutsceneState == CinematicState.Clicked_Twice)
                     {
-                        Mouse.Click(MouseButton.LEFT, 15, 15);
-                        Keyboard.Stroke(Blish_HUD.Controls.Extern.VirtualKeyShort.ESCAPE);
-                        CutsceneState = CinematicState.Done;
+                        if (ModuleState == State.MouseMovedBack)
+                        {
+                            Mouse.Click(MouseButton.LEFT, 15, 15);
+                            ModuleState = State.Menu_Opened;
+                        }
+                        else if(ModuleState == State.Menu_Opened)
+                        {
+                            Keyboard.Stroke(Blish_HUD.Controls.Extern.VirtualKeyShort.ESCAPE);
+                            ModuleState = State.Menu_Closed;
+                            CutsceneState = CinematicState.Done;
+                        }
                     }
                 }
                 else if (ModuleState != State.Ready || CutsceneState != CinematicState.Ready)
                 {
                     if (ModuleState == State.Clicked && MouseStartPosition != Point.Zero)
                     {
-                        Mouse.Click(MouseButton.LEFT, 15, 15);
-                        Keyboard.Stroke(Blish_HUD.Controls.Extern.VirtualKeyShort.ESCAPE);
+                        if (ModuleState == State.Clicked)
+                        {
+                            Mouse.Click(MouseButton.LEFT, 15, 15);
+                            ModuleState = State.Menu_Opened;
+                        }
+                        else if (ModuleState == State.Menu_Opened)
+                        {
+                            Keyboard.Stroke(Blish_HUD.Controls.Extern.VirtualKeyShort.ESCAPE);
+                            ModuleState = State.Menu_Closed;
+                        }
 
                         Mouse.SetPosition(MouseStartPosition.X, MouseStartPosition.Y, true);
                         CutsceneState = CinematicState.Done;

@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Blish_HUD.Controls.Extern;
 
 namespace Kenedia.Modules.QoL.SubModules
 {
@@ -228,6 +229,61 @@ namespace Kenedia.Modules.QoL.SubModules
             ToggleModule_Key.Value.Activated -= ToggleModule_Key_Activated;
 
             base.Dispose();
+        }
+
+        private void Cancel_Key_Activated(object sender, EventArgs e)
+        {
+            ModuleState = State.Done;
+        }
+
+        public async Task Paste()
+        {
+            ModuleState = State.Pasting;
+
+            await Task.Delay(25);
+
+            Blish_HUD.Controls.Intern.Keyboard.Press(VirtualKeyShort.LCONTROL, true);
+            Blish_HUD.Controls.Intern.Keyboard.Stroke(VirtualKeyShort.KEY_V, true);
+            await Task.Delay(5);
+            Blish_HUD.Controls.Intern.Keyboard.Release(VirtualKeyShort.LCONTROL, true);
+
+            ModuleState = State.Pasted;
+        }
+
+        public async Task Copy()
+        {
+            ModuleState = State.Copying;
+
+            await Task.Delay(25);
+
+            Blish_HUD.Controls.Intern.Keyboard.Release(VirtualKeyShort.LSHIFT, true);
+            await Task.Delay(5);
+
+            Blish_HUD.Controls.Intern.Keyboard.Press(VirtualKeyShort.LCONTROL, true);
+            Blish_HUD.Controls.Intern.Keyboard.Stroke(VirtualKeyShort.KEY_A, true);
+            await Task.Delay(5);
+            Blish_HUD.Controls.Intern.Keyboard.Release(VirtualKeyShort.LCONTROL, true);
+
+            Blish_HUD.Controls.Intern.Keyboard.Press(VirtualKeyShort.LCONTROL, true);
+            Blish_HUD.Controls.Intern.Keyboard.Stroke(VirtualKeyShort.KEY_C, true);
+            await Task.Delay(5);
+            Blish_HUD.Controls.Intern.Keyboard.Release(VirtualKeyShort.LCONTROL, true);
+
+            Blish_HUD.Controls.Intern.Keyboard.Stroke(VirtualKeyShort.BACK, true);
+            Blish_HUD.Controls.Intern.Keyboard.Stroke(VirtualKeyShort.RETURN, true);
+
+            var text = await ClipboardUtil.WindowsClipboardService.GetTextAsync();
+
+            if (text.Length > 0)
+            {
+                text = text.StartsWith("[") ? text.Substring(1, text.Length - 1) : text;
+                text = text.EndsWith("]") ? text.Substring(0, text.Length - 1) : text;
+
+                await ClipboardUtil.WindowsClipboardService.SetTextAsync(text);
+            }
+
+            ModuleState = State.Copied;
+            DeleteIndicator.Visible = true;
         }
     }
 }
