@@ -30,7 +30,19 @@ namespace Kenedia.Modules.QoL.Classes
         public string Name;
 
         public bool Loaded;
-        public bool Active;
+        public bool Active
+        {
+            get {
+                return _Active != null && _Active.Value;
+            }
+            set
+            {
+                if(_Active != null)
+                {
+                    _Active.Value = value;
+                }
+            }
+        }
         public bool Include;
 
         public Texture2D ModuleIcon;
@@ -41,6 +53,7 @@ namespace Kenedia.Modules.QoL.Classes
         public event EventHandler Toggled;
 
         public SettingEntry<Blish_HUD.Input.KeyBinding> ToggleModule_Key;
+        public SettingEntry<bool> _Active;
 
         public Ticks Ticks = new Ticks();
         public Hotbar_Button Hotbar_Button;
@@ -50,7 +63,11 @@ namespace Kenedia.Modules.QoL.Classes
             
         }
 
-        public abstract void DefineSettings(SettingCollection parentSettings);
+        public virtual void DefineSettings(SettingCollection settings)
+        {
+            var internal_settings = settings.AddSubCollection(Name + " Internal Settings", false, false);
+            _Active = internal_settings.DefineSetting(nameof(_Active), false);
+        }
 
         private void CornerIcon_Click(object sender, Blish_HUD.Input.MouseEventArgs e)
         {

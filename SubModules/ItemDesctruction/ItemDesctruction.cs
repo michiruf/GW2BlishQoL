@@ -52,6 +52,7 @@ namespace Kenedia.Modules.QoL.SubModules
         }
         public override void DefineSettings(SettingCollection settings)
         {
+            base.DefineSettings(settings);
 
             ToggleModule_Key = settings.DefineSetting(Name + nameof(ToggleModule_Key),
                                                       new Blish_HUD.Input.KeyBinding(ModifierKeys.Ctrl, Keys.Delete),
@@ -114,7 +115,7 @@ namespace Kenedia.Modules.QoL.SubModules
                 Texture = QoL.ModuleInstance.TextureManager.getControl(_Controls.Delete),
                 ClipsBounds = false,
             };
-
+            
         }
 
         public override void LoadData()
@@ -134,7 +135,8 @@ namespace Kenedia.Modules.QoL.SubModules
                 var Clicked = MouseState == ButtonState.Pressed && mouse.LeftButton == ButtonState.Released;
                 if (mouse.LeftButton == ButtonState.Pressed && MouseState == ButtonState.Released)
                 {
-                    if (ItemPos.Distance2D(mouse.Position) < 50)
+
+                    if (ItemPos.Distance2D(mouse.Position) < 100)
                     {
                         MousePos = MousePos == Point.Zero ? mouse.Position : MousePos;
                     }
@@ -153,13 +155,17 @@ namespace Kenedia.Modules.QoL.SubModules
                         ItemPos = mouse.Position;
                         DeleteIndicator.Visible = true;
                         Instruction = Strings.common.ThrowItem;
-                        Copy();
+                        AsyncHelper.RunSync(this.Copy); //Copy();
                     }
                     else if (DeletePrepared)
                     {
-                        if (MousePos.Distance2D(mouse.Position) > 100)
+                        if (MousePos.Distance2D(mouse.Position) > 15)
                         {
-                            Paste();
+                            AsyncHelper.RunSync(this.Paste); //Paste();
+                        }
+                        else
+                        {
+
                         }
 
                         DeletePrepared = false;

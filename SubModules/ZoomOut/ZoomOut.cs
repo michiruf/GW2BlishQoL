@@ -1,4 +1,5 @@
 ﻿using Blish_HUD;
+using Blish_HUD.Controls;
 using Blish_HUD.Settings;
 using Kenedia.Modules.QoL.Classes;
 using Microsoft.Xna.Framework;
@@ -7,18 +8,20 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Kenedia.Modules.QoL.SubModules
 {
     public class ZoomOut : SubModule
     {
-        private int MumbleTick;
-        private Point Resolution;
-        private bool InGame;
+        private bool MouseScrolled;
+        private float Distance;
         private float Zoom;
         private int ZoomTicks = 0;
         public SettingEntry<Blish_HUD.Input.KeyBinding> ManualMaxZoomOut;
+        public SettingEntry<bool> ZoomOnCameraChange;
+        public SettingEntry<bool> AllowManualZoom;
 
         public ZoomOut()
         {
@@ -35,6 +38,8 @@ namespace Kenedia.Modules.QoL.SubModules
 
         public override void DefineSettings(SettingCollection settings)
         {
+            base.DefineSettings(settings);
+
             ToggleModule_Key = settings.DefineSetting(Name + nameof(ToggleModule_Key),
                                                       new Blish_HUD.Input.KeyBinding(ModifierKeys.Ctrl, Keys.NumPad0),
                                                       () => string.Format(Strings.common.Toggle, Name));
@@ -44,6 +49,16 @@ namespace Kenedia.Modules.QoL.SubModules
                                                       new Blish_HUD.Input.KeyBinding(Keys.None),
                                                       () => Strings.common.ManualMaxZoomOut_Name,
                                                       () => Strings.common.ManualMaxZoomOut_Tooltip);
+
+            ZoomOnCameraChange = settings.DefineSetting(nameof(ZoomOnCameraChange),
+                                                      true,
+                                                      () => Strings.common.ZoomOnCameraChange_Name,
+                                                      () => Strings.common.ZoomOnCameraChange_Tooltip);
+
+            AllowManualZoom = settings.DefineSetting(nameof(AllowManualZoom),
+                                                      true,
+                                                      () => Strings.common.AllowManualZoom_Name,
+                                                      () => Strings.common.AllowManualZoom_Tooltip);
 
             ManualMaxZoomOut.Value.Enabled = true;
             ManualMaxZoomOut.Value.Activated += ManualMaxZoomOut_Triggered;
@@ -66,8 +81,14 @@ namespace Kenedia.Modules.QoL.SubModules
         public override void Initialize()
         {
             base.Initialize();
-
+            InputService.Input.Mouse.MouseWheelScrolled += Mouse_MouseWheelScrolled;
         }
+
+        private void Mouse_MouseWheelScrolled(object sender, Blish_HUD.Input.MouseEventArgs e)
+        {
+            MouseScrolled = true;
+        }
+
         private void ManualMaxZoomOut_Triggered(object sender, EventArgs e)
         {
             ZoomTicks = 40;
@@ -83,33 +104,37 @@ namespace Kenedia.Modules.QoL.SubModules
         {
             var Mumble = GameService.Gw2Mumble;
 
-            if (Zoom < Mumble.PlayerCamera.FieldOfView)
+            if (gameTime.TotalGameTime.Milliseconds - Ticks.global > 125)
             {
-                ZoomTicks += 2;
+                Ticks.global = gameTime.TotalGameTime.Milliseconds;
+
             }
-            else if (ZoomTicks > 0)
+
+            if (ZoomTicks > 0)
             {
                 Blish_HUD.Controls.Intern.Mouse.RotateWheel(-25);
                 ZoomTicks -= 1;
             }
-            var mouse = Mouse.GetState();
-            var mouseState = (mouse.LeftButton == ButtonState.Released) ? ButtonState.Released : ButtonState.Pressed;
 
-            if (mouseState == ButtonState.Pressed || GameService.Graphics.Resolution != Resolution)
+            var cameraDistance = (Math.Max(Mumble.PlayerCamera.Position.Z, Mumble.PlayerCharacter.Position.Z) - Math.Min(Mumble.PlayerCamera.Position.Z, Mumble.PlayerCharacter.Position.Z));
+            var delta = (Math.Max(Distance, cameraDistance) - Math.Min(Distance, cameraDistance));
+            var threshold = AllowManualZoom.Value ? 0.5 : 0.25;
+            if (cameraDistance == Distance) ZoomTicks = ZoomTicks/2;
+
+            if (delta > threshold)
             {
-                Resolution = GameService.Graphics.Resolution;
-                MumbleTick = Mumble.Tick + 5;
-                return;
+                if (ZoomOnCameraChange.Value && (!AllowManualZoom.Value || !MouseScrolled) && Distance != 0)
+                {
+                    ZoomTicks = 2;
+                }
+                MouseScrolled = false;
+                Distance = cameraDistance;
             }
 
-            if (!GameService.GameIntegration.Gw2Instance.IsInGame && InGame && Mumble.Tick > MumbleTick)
+            if (Zoom < Mumble.PlayerCamera.FieldOfView)
             {
-                Blish_HUD.Controls.Intern.Keyboard.Stroke(Blish_HUD.Controls.Extern.VirtualKeyShort.ESCAPE, false);
-                Blish_HUD.Controls.Intern.Mouse.Click(Blish_HUD.Controls.Intern.MouseButton.LEFT, 5, 5);
-
-                MumbleTick = Mumble.Tick + 1;
+                ZoomTicks += 2;
             }
-            InGame = GameService.GameIntegration.Gw2Instance.IsInGame;
 
             Zoom = Mumble.PlayerCamera.FieldOfView;
         }
@@ -122,6 +147,7 @@ namespace Kenedia.Modules.QoL.SubModules
         {
             ToggleModule_Key.Value.Activated -= ToggleModule_Key_Activated;
             ManualMaxZoomOut.Value.Activated -= ManualMaxZoomOut_Triggered;
+            InputService.Input.Mouse.MouseWheelScrolled -= Mouse_MouseWheelScrolled;
 
             base.Dispose();
         }

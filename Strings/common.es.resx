@@ -120,6 +120,12 @@
   <data name="Activated" xml:space="preserve">
     <value>activado</value>
   </data>
+  <data name="AllowManualZoom_Name" xml:space="preserve">
+    <value>Permitir el desplazamiento del ratón</value>
+  </data>
+  <data name="AllowManualZoom_Tooltip" xml:space="preserve">
+    <value>Permitir el desplazamiento con la rueda del ratón sin activar el zoom</value>
+  </data>
   <data name="ClickItem" xml:space="preserve">
     <value>Mayúsculas + clic en un objeto.</value>
   </data>
@@ -146,5 +152,11 @@
   </data>
   <data name="Toggle" xml:space="preserve">
     <value>{0} de alternancia</value>
+  </data>
+  <data name="ZoomOnCameraChange_Name" xml:space="preserve">
+    <value>Cambio de zoom en la cámara</value>
+  </data>
+  <data name="ZoomOnCameraChange_Tooltip" xml:space="preserve">
+    <value>Alejar el zoom cada vez que la distancia entre el jugador y la cámara cambia por más de 0,25 unidades</value>
   </data>
 </root>

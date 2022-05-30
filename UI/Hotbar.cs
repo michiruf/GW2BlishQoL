@@ -91,7 +91,9 @@ namespace Kenedia.Modules.QoL.UI
             SubControls.Add(btn);
 
             FlowPanel.Size = new Point((int) (FlowPanel.OuterControlPadding.X *2) + SubControls.Count * (ButtonSize.X + (int) FlowPanel.ControlPadding.X), Height);
-            TotalBounds = new Rectangle(Point.Zero, new Point(FlowPanel.Size.X + ExpanderSize.X, Height));
+            TotalBounds = new Rectangle(Point.Zero, new Point(ExpanderSize.X + (SubControls.Count * ((int)(FlowPanel.ControlPadding.X) + ButtonSize.X)), Height));
+
+            SubModule_Toggled(null, null);
         }
 
         private void SubModule_Toggled(object sender, EventArgs e)

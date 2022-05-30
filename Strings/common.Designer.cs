@@ -70,6 +70,24 @@ namespace Kenedia.Modules.QoL.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Allow Mouse Scroll.
+        /// </summary>
+        internal static string AllowManualZoom_Name {
+            get {
+                return ResourceManager.GetString("AllowManualZoom_Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Allow scrolling with your mouse wheel without triggering zooming out.
+        /// </summary>
+        internal static string AllowManualZoom_Tooltip {
+            get {
+                return ResourceManager.GetString("AllowManualZoom_Tooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Shift + Click on an Item!.
         /// </summary>
         internal static string ClickItem {
@@ -147,6 +165,24 @@ namespace Kenedia.Modules.QoL.Strings {
         internal static string Toggle {
             get {
                 return ResourceManager.GetString("Toggle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Zoom on Camera change.
+        /// </summary>
+        internal static string ZoomOnCameraChange_Name {
+            get {
+                return ResourceManager.GetString("ZoomOnCameraChange_Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Zoom out every time the distance between the player and the camera changes for more than 0.25 units.
+        /// </summary>
+        internal static string ZoomOnCameraChange_Tooltip {
+            get {
+                return ResourceManager.GetString("ZoomOnCameraChange_Tooltip", resourceCulture);
             }
         }
     }

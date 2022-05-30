@@ -1,4 +1,5 @@
 ﻿using Blish_HUD;
+using Blish_HUD.Controls;
 using Blish_HUD.Controls.Extern;
 using System;
 using System.Collections.Generic;
@@ -16,50 +17,57 @@ namespace Kenedia.Modules.QoL.SubModules
             DeletePrepared = false;
         }
 
-        public async void Paste()
+        public async Task Paste()
         {
-            await Task.Run(() =>
-            {
-                Blish_HUD.Controls.Intern.Keyboard.Press(VirtualKeyShort.LCONTROL, true);
-                Blish_HUD.Controls.Intern.Keyboard.Stroke(VirtualKeyShort.KEY_A, true);
-                Thread.Sleep(5);
-                Blish_HUD.Controls.Intern.Keyboard.Stroke(VirtualKeyShort.KEY_V, true);
-                Thread.Sleep(5);
-                Blish_HUD.Controls.Intern.Keyboard.Release(VirtualKeyShort.LCONTROL, true);
-                DeletePrepared = false;
-            });
+            var text = await ClipboardUtil.WindowsClipboardService.GetTextAsync();
+            await Task.Delay(50);
+
+            Blish_HUD.Controls.Intern.Keyboard.Press(VirtualKeyShort.LCONTROL, true);
+            Blish_HUD.Controls.Intern.Keyboard.Stroke(VirtualKeyShort.KEY_A, true);
+            await Task.Delay(5);
+            Blish_HUD.Controls.Intern.Keyboard.Stroke(VirtualKeyShort.KEY_V, true);
+            await Task.Delay(5);
+            Blish_HUD.Controls.Intern.Keyboard.Release(VirtualKeyShort.LCONTROL, true);
+
+            DeletePrepared = false;
         }
 
-        public async void Copy()
+        public async Task Copy()
         {
             DeleteRunning = true;
-            await Task.Run(() =>
+
+
+            Blish_HUD.Controls.Intern.Keyboard.Press(VirtualKeyShort.LCONTROL, true);
+            Blish_HUD.Controls.Intern.Keyboard.Stroke(VirtualKeyShort.KEY_A, true);
+            await Task.Delay(15);
+            Blish_HUD.Controls.Intern.Keyboard.Release(VirtualKeyShort.LCONTROL, true);
+
+            await Task.Delay(25);
+
+
+            Blish_HUD.Controls.Intern.Keyboard.Press(VirtualKeyShort.LCONTROL, true);
+            Blish_HUD.Controls.Intern.Keyboard.Stroke(VirtualKeyShort.KEY_C, true);
+            await Task.Delay(15);
+            Blish_HUD.Controls.Intern.Keyboard.Release(VirtualKeyShort.LCONTROL, true);
+
+
+            await Task.Delay(5);
+            Blish_HUD.Controls.Intern.Keyboard.Stroke(VirtualKeyShort.BACK, true);
+            Blish_HUD.Controls.Intern.Keyboard.Release(VirtualKeyShort.LSHIFT, true);
+            Blish_HUD.Controls.Intern.Keyboard.Stroke(VirtualKeyShort.RETURN, true);
+            await Task.Delay(5);
+
+            var text = await ClipboardUtil.WindowsClipboardService.GetTextAsync();
+
+            if (text.Length > 0)
             {
-                Blish_HUD.Controls.Intern.Keyboard.Press(VirtualKeyShort.LCONTROL, true);
-                Blish_HUD.Controls.Intern.Keyboard.Stroke(VirtualKeyShort.KEY_A, true);
-                Thread.Sleep(5);
-                Blish_HUD.Controls.Intern.Keyboard.Release(VirtualKeyShort.LCONTROL, true);
+                text = text.StartsWith("[") ? text.Substring(1, text.Length - 1) : text;
+                text = text.EndsWith("]") ? text.Substring(0, text.Length - 1) : text;
 
+                await ClipboardUtil.WindowsClipboardService.SetTextAsync(text);
+            }
 
-                Blish_HUD.Controls.Intern.Keyboard.Press(VirtualKeyShort.LCONTROL, true);
-                Blish_HUD.Controls.Intern.Keyboard.Stroke(VirtualKeyShort.KEY_C, true);
-                Thread.Sleep(5);
-                Blish_HUD.Controls.Intern.Keyboard.Release(VirtualKeyShort.LCONTROL, true);
-
-                Blish_HUD.Controls.Intern.Keyboard.Release(VirtualKeyShort.LSHIFT, true);
-                Thread.Sleep(5);
-                Blish_HUD.Controls.Intern.Keyboard.Stroke(VirtualKeyShort.BACK, true);
-                Blish_HUD.Controls.Intern.Keyboard.Stroke(VirtualKeyShort.RETURN, true);
-            });
-
-            await Task.Run(() =>
-            {
-                var text = ClipboardUtil.WindowsClipboardService.GetTextAsync()?.Result;
-                text = text.Length > 3 ? text.Substring(1, text.Length - 2) : "";
-
-                if (text.Length > 0) ClipboardUtil.WindowsClipboardService.SetTextAsync(text);
-                DeletePrepared = true;
-            });
+            DeletePrepared = true;
 
             DeleteRunning = false;
         }

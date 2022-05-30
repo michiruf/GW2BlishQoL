@@ -11,7 +11,15 @@ namespace Kenedia.Modules.QoL.SubModules
 {
     public partial class SkipCutscenes
     {
-        void Click()
+        public async Task CloseGameMenu()
+        {
+            Mouse.Click(MouseButton.LEFT, 15, 15);
+
+            await Task.Delay(5);
+            Keyboard.Stroke(Blish_HUD.Controls.Extern.VirtualKeyShort.ESCAPE);
+        }
+
+        public async Task Click()
         {
             var mousePos = Mouse.GetPosition();
             mousePos = new System.Drawing.Point(mousePos.X, mousePos.Y);
@@ -21,11 +29,11 @@ namespace Kenedia.Modules.QoL.SubModules
             var p = new System.Drawing.Point(GameService.Graphics.Resolution.X + pos.Left - 35, GameService.Graphics.Resolution.Y + pos.Top);
 
             Mouse.SetPosition(p.X, p.Y, true);
-            Thread.Sleep(25);
+            await Task.Delay(25);
 
             Mouse.Click(MouseButton.LEFT, p.X, p.Y, true);
 
-            Thread.Sleep(10);
+            await Task.Delay(10);
             Mouse.SetPosition(mousePos.X, mousePos.Y, true);
         }
     }

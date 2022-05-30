@@ -120,6 +120,12 @@
   <data name="Activated" xml:space="preserve">
     <value>activated</value>
   </data>
+  <data name="AllowManualZoom_Name" xml:space="preserve">
+    <value>Allow Mouse Scroll</value>
+  </data>
+  <data name="AllowManualZoom_Tooltip" xml:space="preserve">
+    <value>Allow scrolling with your mouse wheel without triggering zooming out</value>
+  </data>
   <data name="ClickItem" xml:space="preserve">
     <value>Shift + Click on an Item!</value>
   </data>
@@ -146,5 +152,11 @@
   </data>
   <data name="Toggle" xml:space="preserve">
     <value>Toggle {0}</value>
+  </data>
+  <data name="ZoomOnCameraChange_Name" xml:space="preserve">
+    <value>Zoom on Camera change</value>
+  </data>
+  <data name="ZoomOnCameraChange_Tooltip" xml:space="preserve">
+    <value>Zoom out every time the distance between the player and the camera changes for more than 0.25 units</value>
   </data>
 </root>

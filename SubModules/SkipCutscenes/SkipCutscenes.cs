@@ -64,6 +64,8 @@ namespace Kenedia.Modules.QoL.SubModules
 
         public override void DefineSettings(SettingCollection settings)
         {
+            base.DefineSettings(settings);
+
             ToggleModule_Key = settings.DefineSetting(Name + nameof(ToggleModule_Key),
                                                       new Blish_HUD.Input.KeyBinding(Keys.None),
                                                       () => string.Format(Strings.common.Toggle, Name));
@@ -155,7 +157,8 @@ namespace Kenedia.Modules.QoL.SubModules
                 if (Mumble.Tick > MumbleTick)
                 {
                     //ScreenNotification.ShowNotification("Click ... ", ScreenNotification.NotificationType.Error);
-                    Click();
+                    //Click();
+                    AsyncHelper.RunSync(this.Click); //Paste();
 
                     ClickAgain = true;
                     MumbleTick = Mumble.Tick;
@@ -174,13 +177,10 @@ namespace Kenedia.Modules.QoL.SubModules
                     //ScreenNotification.ShowNotification("Click Again... ", ScreenNotification.NotificationType.Error);
                     ClickAgain = false;
 
-                    Click();
+                    //Click();
 
-                    //Thread.Sleep(5);
-                    Mouse.Click(MouseButton.LEFT, 15, 15);
-
-                    Thread.Sleep(5);
-                    Keyboard.Stroke(Blish_HUD.Controls.Extern.VirtualKeyShort.ESCAPE);
+                    AsyncHelper.RunSync(this.Click); //Paste();
+                    AsyncHelper.RunSync(this.CloseGameMenu); //Paste();
                 }
             }
             else

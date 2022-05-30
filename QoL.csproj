@@ -64,6 +64,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\AsyncHelper.cs" />
     <Compile Include="Classes\ExtensionMethods.cs" />
     <Compile Include="Classes\SubModule.cs" />
     <Compile Include="Classes\TextureManager.cs" />

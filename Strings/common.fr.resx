@@ -120,6 +120,12 @@
   <data name="Activated" xml:space="preserve">
     <value>activé</value>
   </data>
+  <data name="AllowManualZoom_Name" xml:space="preserve">
+    <value>Autoriser le défilement de la souris</value>
+  </data>
+  <data name="AllowManualZoom_Tooltip" xml:space="preserve">
+    <value>Allow scrolling with your mouse wheel without triggering zooming out</value>
+  </data>
   <data name="ClickItem" xml:space="preserve">
     <value>Shift + Click un item !</value>
   </data>
@@ -141,10 +147,19 @@
   <data name="ShowCorner_Tooltip" xml:space="preserve">
     <value>Afficher / masquer l'icône d'angle de {0}.</value>
   </data>
+  <data name="String1" xml:space="preserve">
+    <value>Permettre le défilement avec la molette de la souris sans déclencher de zoom arrière</value>
+  </data>
   <data name="ThrowItem" xml:space="preserve">
     <value>Jetez l'article marqué !</value>
   </data>
   <data name="Toggle" xml:space="preserve">
     <value>Basculer le {0}</value>
+  </data>
+  <data name="ZoomOnCameraChange_Name" xml:space="preserve">
+    <value>Changement de zoom sur la caméra</value>
+  </data>
+  <data name="ZoomOnCameraChange_Tooltip" xml:space="preserve">
+    <value>Zoom arrière à chaque fois que la distance entre le joueur et la caméra change de plus de 0,25 unité.</value>
   </data>
 </root>
