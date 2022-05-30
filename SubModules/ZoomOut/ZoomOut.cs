@@ -82,6 +82,20 @@ namespace Kenedia.Modules.QoL.SubModules
         {
             base.Initialize();
             InputService.Input.Mouse.MouseWheelScrolled += Mouse_MouseWheelScrolled;
+
+            var Mumble = GameService.Gw2Mumble;
+            Mumble.CurrentMap.MapChanged += CurrentMap_MapChanged;
+            Mumble.PlayerCharacter.NameChanged += PlayerCharacter_NameChanged;
+        }
+
+        private void PlayerCharacter_NameChanged(object sender, ValueEventArgs<string> e)
+        {
+            ZoomTicks = 0;
+        }
+
+        private void CurrentMap_MapChanged(object sender, ValueEventArgs<int> e)
+        {
+            ZoomTicks = 0;
         }
 
         private void Mouse_MouseWheelScrolled(object sender, Blish_HUD.Input.MouseEventArgs e)
@@ -104,21 +118,16 @@ namespace Kenedia.Modules.QoL.SubModules
         {
             var Mumble = GameService.Gw2Mumble;
 
-            if (gameTime.TotalGameTime.Milliseconds - Ticks.global > 125)
-            {
-                Ticks.global = gameTime.TotalGameTime.Milliseconds;
-
-            }
-
-            if (ZoomTicks > 0)
-            {
-                Blish_HUD.Controls.Intern.Mouse.RotateWheel(-25);
-                ZoomTicks -= 1;
-            }
-
             var cameraDistance = (Math.Max(Mumble.PlayerCamera.Position.Z, Mumble.PlayerCharacter.Position.Z) - Math.Min(Mumble.PlayerCamera.Position.Z, Mumble.PlayerCharacter.Position.Z));
             var delta = (Math.Max(Distance, cameraDistance) - Math.Min(Distance, cameraDistance));
             var threshold = AllowManualZoom.Value ? 0.5 : 0.25;
+
+            if (Mumble.UI.IsMapOpen)
+            {
+                ZoomTicks = 0;
+                return;
+            }
+
             if (cameraDistance == Distance) ZoomTicks = ZoomTicks/2;
 
             if (delta > threshold)
@@ -135,6 +144,12 @@ namespace Kenedia.Modules.QoL.SubModules
             {
                 ZoomTicks += 2;
             }
+            else if (ZoomTicks > 0)
+            {
+                Blish_HUD.Controls.Intern.Mouse.RotateWheel(-25);
+                ZoomTicks -= 1;
+            }
+
 
             Zoom = Mumble.PlayerCamera.FieldOfView;
         }

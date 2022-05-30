@@ -78,7 +78,6 @@
     </Compile>
     <Compile Include="SubModules\ItemDesctruction\Controls\CursorIcon.cs" />
     <Compile Include="SubModules\ItemDesctruction\Helpers\Helpers.cs" />
-    <Compile Include="SubModules\SkipCutscenes\Helpers\Helpers.cs" />
     <Compile Include="SubModules\ItemDesctruction\ItemDesctruction.cs" />
     <Compile Include="SubModules\SkipCutscenes\SkipCutscenes.cs" />
     <Compile Include="SubModules\ZoomOut\ZoomOut.cs" />
@@ -289,6 +288,7 @@
     <Folder Include="ref\textures\controls\" />
     <Folder Include="ref\textures\emblems\" />
     <Folder Include="ref\textures\icons\" />
+    <Folder Include="SubModules\SkipCutscenes\Helpers\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

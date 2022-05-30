@@ -20,6 +20,29 @@ namespace Kenedia.Modules.QoL.SubModules
 {
     public partial class SkipCutscenes : SubModule
     {
+        enum State
+        {
+            Ready,
+            MouseMoved,
+            Clicked,
+            MouseMovedBack,
+            Clicked_Again,
+            Menu_Closed,
+            Done,
+        }
+        enum CinematicState
+        {
+            Ready,
+            InitialSleep,
+            Clicked_Once,
+            Sleeping,
+            Clicked_Twice,
+            Done,
+        }
+        private State ModuleState;
+        private CinematicState CutsceneState;
+        private Point MouseStartPosition;
+
         private int MumbleTick;
         private Point Resolution;
         private Vector3 PPos = Vector3.Zero;
@@ -100,9 +123,6 @@ namespace Kenedia.Modules.QoL.SubModules
 
         private void CurrentMap_MapChanged(object sender, ValueEventArgs<int> e)
         {
-            ClickAgain = false;
-            SleptBeforeClick = false;
-            Ticks.global += 2000;
             MumbleTick = GameService.Gw2Mumble.Tick;
 
             var p = GameService.Gw2Mumble.PlayerCharacter.Position;
@@ -110,8 +130,9 @@ namespace Kenedia.Modules.QoL.SubModules
 
             if (IntroCutscene && StarterMaps.Contains(GameService.Gw2Mumble.CurrentMap.Id))
             {
-                Thread.Sleep(1250);
-                Click();
+                Ticks.global = Ticks.global + 1250;
+                CutsceneState = CinematicState.InitialSleep;
+                ModuleState = State.Ready;
             }
         }
 
@@ -152,44 +173,78 @@ namespace Kenedia.Modules.QoL.SubModules
                 return;
             }
 
-            if (!_inGame && (InGame || ClickAgain) && GameService.GameIntegration.Gw2Instance.Gw2HasFocus)
+            if (gameTime.TotalGameTime.TotalMilliseconds - Ticks.global > 0)
             {
-                if (Mumble.Tick > MumbleTick)
-                {
-                    //ScreenNotification.ShowNotification("Click ... ", ScreenNotification.NotificationType.Error);
-                    //Click();
-                    AsyncHelper.RunSync(this.Click); //Paste();
+                Ticks.global = gameTime.TotalGameTime.TotalMilliseconds;
 
-                    ClickAgain = true;
-                    MumbleTick = Mumble.Tick;
-                    Ticks.global = gameTime.TotalGameTime.TotalMilliseconds + 250;
-                }
-                else if (ClickAgain)
+                WindowUtil.RECT pos;
+                WindowUtil.GetWindowRect(GameService.GameIntegration.Gw2Instance.Gw2WindowHandle, out pos);
+                var p = new System.Drawing.Point(GameService.Graphics.Resolution.X + pos.Left - 35, GameService.Graphics.Resolution.Y + pos.Top);
+
+                var mousePos = Mouse.GetPosition();
+                mousePos = new System.Drawing.Point(mousePos.X, mousePos.Y);
+
+                if (!_inGame && (Mumble.Tick > MumbleTick || CutsceneState != CinematicState.Done))
                 {
-                    if (!SleptBeforeClick)
+                    if (CutsceneState == CinematicState.Clicked_Once)
                     {
-                        //ScreenNotification.ShowNotification("Sleep before we click again... ", ScreenNotification.NotificationType.Error);
-                        Ticks.global = gameTime.TotalGameTime.TotalMilliseconds + 3500;
-                        SleptBeforeClick = true;
+                        Ticks.global = gameTime.TotalGameTime.TotalMilliseconds + 2500;
+                        CutsceneState = CinematicState.Sleeping;
+                        ModuleState = State.Ready;
+                        return;
+                    }
+                    else if (CutsceneState == CinematicState.Ready)
+                    {
+                        Ticks.global = gameTime.TotalGameTime.TotalMilliseconds + 250;
+                        CutsceneState = CinematicState.InitialSleep;
+                        ModuleState = State.Ready;
                         return;
                     }
 
-                    //ScreenNotification.ShowNotification("Click Again... ", ScreenNotification.NotificationType.Error);
-                    ClickAgain = false;
+                    if (CutsceneState == CinematicState.Sleeping || CutsceneState == CinematicState.InitialSleep)
+                    {
+                        if (ModuleState == State.Ready)
+                        {
+                            Mouse.SetPosition(p.X, p.Y, true);
+                            MouseStartPosition = new Point(mousePos.X, mousePos.Y);
+                            ModuleState = State.MouseMoved;
+                        }
+                        else if (ModuleState == State.MouseMoved)
+                        {
+                            Mouse.Click(MouseButton.LEFT, p.X, p.Y, true);
+                            ModuleState = State.Clicked;
+                        }
+                        else if (ModuleState == State.Clicked)
+                        {
+                            Mouse.SetPosition(MouseStartPosition.X, MouseStartPosition.Y, true);
+                            ModuleState = State.MouseMovedBack;
+                            CutsceneState = CutsceneState == CinematicState.Ready ? CinematicState.Clicked_Once : CinematicState.Clicked_Twice;
+                        }
+                    }
 
-                    //Click();
+                    else if (CutsceneState == CinematicState.Clicked_Twice)
+                    {
+                        Mouse.Click(MouseButton.LEFT, 15, 15);
+                        Keyboard.Stroke(Blish_HUD.Controls.Extern.VirtualKeyShort.ESCAPE);
+                        CutsceneState = CinematicState.Done;
+                    }
+                }
+                else if (ModuleState != State.Ready || CutsceneState != CinematicState.Ready)
+                {
+                    if (ModuleState == State.Clicked && MouseStartPosition != Point.Zero)
+                    {
+                        Mouse.Click(MouseButton.LEFT, 15, 15);
+                        Keyboard.Stroke(Blish_HUD.Controls.Extern.VirtualKeyShort.ESCAPE);
 
-                    AsyncHelper.RunSync(this.Click); //Paste();
-                    AsyncHelper.RunSync(this.CloseGameMenu); //Paste();
+                        Mouse.SetPosition(MouseStartPosition.X, MouseStartPosition.Y, true);
+                        CutsceneState = CinematicState.Done;
+                    }
+
+                    ModuleState = State.Ready;
+                    CutsceneState = CinematicState.Ready;
+                    MouseStartPosition = Point.Zero;
                 }
             }
-            else
-            {
-                ClickAgain = false;
-                SleptBeforeClick = false;
-            }
-
-            InGame = GameService.GameIntegration.Gw2Instance.IsInGame;
         }
         public override void UpdateLanguage(object sender, EventArgs e)
         {

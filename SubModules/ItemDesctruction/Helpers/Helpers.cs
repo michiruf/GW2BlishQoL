@@ -14,48 +14,44 @@ namespace Kenedia.Modules.QoL.SubModules
     {
         private void Cancel_Key_Activated(object sender, EventArgs e)
         {
-            DeletePrepared = false;
+            ModuleState = State.Done;
         }
 
         public async Task Paste()
         {
-            var text = await ClipboardUtil.WindowsClipboardService.GetTextAsync();
-            await Task.Delay(50);
+            ModuleState = State.Pasting;
+
+            await Task.Delay(25);
 
             Blish_HUD.Controls.Intern.Keyboard.Press(VirtualKeyShort.LCONTROL, true);
-            Blish_HUD.Controls.Intern.Keyboard.Stroke(VirtualKeyShort.KEY_A, true);
-            await Task.Delay(5);
             Blish_HUD.Controls.Intern.Keyboard.Stroke(VirtualKeyShort.KEY_V, true);
             await Task.Delay(5);
             Blish_HUD.Controls.Intern.Keyboard.Release(VirtualKeyShort.LCONTROL, true);
 
-            DeletePrepared = false;
+            ModuleState = State.Pasted;
         }
 
         public async Task Copy()
         {
-            DeleteRunning = true;
+            ModuleState = State.Copying;
+
+            await Task.Delay(25);
+
             Blish_HUD.Controls.Intern.Keyboard.Release(VirtualKeyShort.LSHIFT, true);
             await Task.Delay(5);
 
             Blish_HUD.Controls.Intern.Keyboard.Press(VirtualKeyShort.LCONTROL, true);
             Blish_HUD.Controls.Intern.Keyboard.Stroke(VirtualKeyShort.KEY_A, true);
-            await Task.Delay(15);
+            await Task.Delay(5);
             Blish_HUD.Controls.Intern.Keyboard.Release(VirtualKeyShort.LCONTROL, true);
-
-            await Task.Delay(25);
-
 
             Blish_HUD.Controls.Intern.Keyboard.Press(VirtualKeyShort.LCONTROL, true);
             Blish_HUD.Controls.Intern.Keyboard.Stroke(VirtualKeyShort.KEY_C, true);
-            await Task.Delay(15);
-            Blish_HUD.Controls.Intern.Keyboard.Release(VirtualKeyShort.LCONTROL, true);
-
-
             await Task.Delay(5);
+            Blish_HUD.Controls.Intern.Keyboard.Release(VirtualKeyShort.LCONTROL, true);
+                        
             Blish_HUD.Controls.Intern.Keyboard.Stroke(VirtualKeyShort.BACK, true);
             Blish_HUD.Controls.Intern.Keyboard.Stroke(VirtualKeyShort.RETURN, true);
-            await Task.Delay(5);
 
             var text = await ClipboardUtil.WindowsClipboardService.GetTextAsync();
 
@@ -67,9 +63,8 @@ namespace Kenedia.Modules.QoL.SubModules
                 await ClipboardUtil.WindowsClipboardService.SetTextAsync(text);
             }
 
-            DeletePrepared = true;
-
-            DeleteRunning = false;
+            ModuleState = State.Copied;
+            DeleteIndicator.Visible = true;
         }
     }
 }

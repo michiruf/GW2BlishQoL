@@ -15,12 +15,24 @@ namespace Kenedia.Modules.QoL.SubModules
 {
     public partial class ItemDestruction : SubModule
     {
+        private enum State
+        {
+            Ready,
+            Copying,
+            Copied,
+            Dragging,
+            ReadyToPaste,
+            Pasting,
+            Pasted,
+            Done,
+        }
+
         public SettingEntry<Blish_HUD.Input.KeyBinding> Cancel_Key;
         private LoadingSpinner LoadingSpinner;
         private CursorSpinner CursorIcon;
         private DeleteIndicator DeleteIndicator;
 
-        private ButtonState MouseState;
+        private State ModuleState;
         private Point MousePos = Point.Zero;
         private Point ItemPos = Point.Zero;
 
@@ -34,9 +46,6 @@ namespace Kenedia.Modules.QoL.SubModules
                 CursorIcon.Instruction = value;
             }
         }
-
-        private bool DeleteRunning;
-        private bool DeletePrepared;
 
         public ItemDestruction()
         {
@@ -66,7 +75,7 @@ namespace Kenedia.Modules.QoL.SubModules
             Cancel_Key.Value.Activated += Cancel_Key_Activated;
 
             ToggleModule_Key.Value.Enabled = true;
-            ToggleModule_Key.Value.Activated += ToggleModule_Key_Activated;            
+            ToggleModule_Key.Value.Activated += ToggleModule_Key_Activated;
         }
 
         private void ToggleModule_Key_Activated(object sender, EventArgs e)
@@ -79,6 +88,7 @@ namespace Kenedia.Modules.QoL.SubModules
             base.ToggleModule();
 
             CursorIcon.Visible = Active;
+            DeleteIndicator?.Hide();
         }
 
         public override void Initialize()
@@ -115,73 +125,76 @@ namespace Kenedia.Modules.QoL.SubModules
                 Texture = QoL.ModuleInstance.TextureManager.getControl(_Controls.Delete),
                 ClipsBounds = false,
             };
-            
+
+
+            InputService.Input.Mouse.LeftMouseButtonPressed += Mouse_LeftMouseButtonPressed;
+            InputService.Input.Mouse.LeftMouseButtonReleased += Mouse_LeftMouseButtonReleased;
+        }
+
+        private async void Mouse_LeftMouseButtonReleased(object sender, Blish_HUD.Input.MouseEventArgs e)
+        {
+            if (ModuleState == State.Dragging)
+            {
+                var mouse = Mouse.GetState();
+
+                if (MousePos.Distance2D(mouse.Position) > 15)
+                {
+                    await Paste();
+                }
+                else
+                {
+                    ModuleState = State.Done;
+                }
+            }
+        }
+
+        private async void Mouse_LeftMouseButtonPressed(object sender, Blish_HUD.Input.MouseEventArgs e)
+        {
+            var mouse = Mouse.GetState();
+            var keyboard = Keyboard.GetState();
+            DeleteIndicator.Visible = false;
+
+            if (ModuleState != State.Copying && ModuleState != State.Pasting)
+            {
+                if (keyboard.IsKeyDown(Keys.LeftShift))
+                {
+                    ItemPos = mouse.Position;
+                    Instruction = Strings.common.ThrowItem;
+                    await Copy();
+                }
+            }
+
+            if (ItemPos.Distance2D(mouse.Position) > 100)
+            {
+                ModuleState = State.Done;
+            }
+            else if (ModuleState == State.ReadyToPaste)
+            {
+                ModuleState = State.Dragging;
+            }
         }
 
         public override void LoadData()
         {
-
             Loaded = true;
         }
 
         public override void Update(GameTime gameTime)
         {
-
-            if (GameIntegrationService.GameIntegration.Gw2Instance.Gw2HasFocus && !DeleteRunning)
+            if (ModuleState == State.Copied)
             {
-                var mouse = Mouse.GetState();
-                var keyboard = Keyboard.GetState();
-
-                var Clicked = MouseState == ButtonState.Pressed && mouse.LeftButton == ButtonState.Released;
-                if (mouse.LeftButton == ButtonState.Pressed && MouseState == ButtonState.Released)
-                {
-
-                    if (ItemPos.Distance2D(mouse.Position) < 100)
-                    {
-                        MousePos = MousePos == Point.Zero ? mouse.Position : MousePos;
-                    }
-                    else
-                    {
-                        DeletePrepared = false;
-                    }
-                }
-
-                if (Clicked)
-                {
-                    DeleteIndicator.Visible = false;
-
-                    if (keyboard.IsKeyDown(Keys.LeftShift))
-                    {
-                        ItemPos = mouse.Position;
-                        DeleteIndicator.Visible = true;
-                        Instruction = Strings.common.ThrowItem;
-                        AsyncHelper.RunSync(this.Copy); //Copy();
-                    }
-                    else if (DeletePrepared)
-                    {
-                        if (MousePos.Distance2D(mouse.Position) > 15)
-                        {
-                            AsyncHelper.RunSync(this.Paste); //Paste();
-                        }
-                        else
-                        {
-
-                        }
-
-                        DeletePrepared = false;
-                        DeleteIndicator.Visible = false;
-                    }
-                    else
-                    {
-                        MousePos = Point.Zero;
-                        Instruction = Strings.common.ClickItem;
-                    }
-                }
-
-                MouseState = mouse.LeftButton;
+                ModuleState = State.ReadyToPaste;
             }
-
+            else if (ModuleState == State.Done || ModuleState == State.Pasted)
+            {
+                MousePos = Point.Zero;
+                DeleteIndicator.Visible = false;
+                Instruction = Strings.common.ClickItem;
+                ModuleState = State.Ready;
+                DeleteIndicator.Visible = false;
+            }
         }
+
         public override void UpdateLanguage(object sender, EventArgs e)
         {
             base.UpdateLanguage(sender, e);
