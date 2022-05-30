@@ -35,7 +35,8 @@ namespace Kenedia.Modules.QoL.SubModules
         public async Task Copy()
         {
             DeleteRunning = true;
-
+            Blish_HUD.Controls.Intern.Keyboard.Release(VirtualKeyShort.LSHIFT, true);
+            await Task.Delay(5);
 
             Blish_HUD.Controls.Intern.Keyboard.Press(VirtualKeyShort.LCONTROL, true);
             Blish_HUD.Controls.Intern.Keyboard.Stroke(VirtualKeyShort.KEY_A, true);
@@ -53,7 +54,6 @@ namespace Kenedia.Modules.QoL.SubModules
 
             await Task.Delay(5);
             Blish_HUD.Controls.Intern.Keyboard.Stroke(VirtualKeyShort.BACK, true);
-            Blish_HUD.Controls.Intern.Keyboard.Release(VirtualKeyShort.LSHIFT, true);
             Blish_HUD.Controls.Intern.Keyboard.Stroke(VirtualKeyShort.RETURN, true);
             await Task.Delay(5);
 
