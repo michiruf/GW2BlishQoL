@@ -13,6 +13,14 @@ using System.Threading.Tasks;
 
 namespace Kenedia.Modules.QoL.UI
 {
+    public enum ExpandDirection
+    {
+        LeftToRight,
+        RightToLeft,
+        TopToBottom,
+        BottomToTop,
+    }
+
     public class Hotbar_Button : Control
     {
         public SubModule SubModule;
@@ -49,6 +57,7 @@ namespace Kenedia.Modules.QoL.UI
 
     public class Hotbar : Container
     {
+
         List<Hotbar_Button> SubControls = new List<Hotbar_Button>();
         FlowPanel FlowPanel;
 
@@ -56,7 +65,12 @@ namespace Kenedia.Modules.QoL.UI
         AsyncTexture2D Expand;
         AsyncTexture2D Expand_Hovered;
 
+        ExpandDirection ExpandDirection;
+
         bool Expanded;
+        bool Dragging;
+        Point DraggingStart;
+        Point DraggingDestination;
 
         public Point ButtonSize = new Point(24, 24);
         Point ExpanderSize = new Point(32, 32);
@@ -71,6 +85,7 @@ namespace Kenedia.Modules.QoL.UI
             Background = texture.GetRegion(25, 25, texture.Width - 25, texture.Height - 25);
             Expand = QoL.ModuleInstance.TextureManager.getIcon(_Icons.Expand);
             Expand_Hovered = QoL.ModuleInstance.TextureManager.getIcon(_Icons.Expand_Hovered);
+            ExpandDirection = ExpandDirection.LeftToRight;
             FlowPanel = new FlowPanel()
             {
                 Parent = this,
@@ -112,11 +127,29 @@ namespace Kenedia.Modules.QoL.UI
             btn.Dispose();
         }
 
+        protected override void OnLeftMouseButtonPressed(MouseEventArgs e)
+        {
+            base.OnLeftMouseButtonPressed(e);
+            Dragging = Input.Keyboard.ActiveModifiers == Microsoft.Xna.Framework.Input.ModifierKeys.Alt;
+            DraggingStart = Dragging ? RelativeMousePosition : Point.Zero;
+        }
+
+        protected override void OnLeftMouseButtonReleased(MouseEventArgs e)
+        {
+            base.OnLeftMouseButtonReleased(e);
+            Dragging = false;
+        }
+
         public override void UpdateContainer(GameTime gameTime)
         {
             base.UpdateContainer(gameTime);
 
-            Expanded = MouseOver || FlowPanel.MouseOver;
+            if (Dragging)
+            {
+                Location = Input.Mouse.Position.Add(new Point(-DraggingStart.X, -DraggingStart.Y));
+            }
+
+            Expanded = MouseOver || FlowPanel.MouseOver || Input.Keyboard.ActiveModifiers == Microsoft.Xna.Framework.Input.ModifierKeys.Alt;
             if (Expanded)
             {
 

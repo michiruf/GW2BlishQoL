@@ -134,44 +134,50 @@ namespace Kenedia.Modules.QoL.SubModules
 
         private async void Mouse_LeftMouseButtonReleased(object sender, Blish_HUD.Input.MouseEventArgs e)
         {
-            if (ModuleState == State.Dragging)
+            if (Active)
             {
-                var mouse = Mouse.GetState();
+                if (ModuleState == State.Dragging)
+                {
+                    var mouse = Mouse.GetState();
 
-                if (MousePos.Distance2D(mouse.Position) > 15)
-                {
-                    await Paste();
-                }
-                else
-                {
-                    ModuleState = State.Done;
+                    if (MousePos.Distance2D(mouse.Position) > 15)
+                    {
+                        await Paste();
+                    }
+                    else
+                    {
+                        ModuleState = State.Done;
+                    }
                 }
             }
         }
 
         private async void Mouse_LeftMouseButtonPressed(object sender, Blish_HUD.Input.MouseEventArgs e)
         {
-            var mouse = Mouse.GetState();
-            var keyboard = Keyboard.GetState();
-            DeleteIndicator.Visible = false;
-
-            if (ModuleState != State.Copying && ModuleState != State.Pasting)
+            if (Active)
             {
-                if (keyboard.IsKeyDown(Keys.LeftShift))
+                var mouse = Mouse.GetState();
+                var keyboard = Keyboard.GetState();
+                DeleteIndicator.Visible = false;
+
+                if (ModuleState != State.Copying && ModuleState != State.Pasting)
                 {
-                    ItemPos = mouse.Position;
-                    Instruction = Strings.common.ThrowItem;
-                    await Copy();
+                    if (keyboard.IsKeyDown(Keys.LeftShift))
+                    {
+                        ItemPos = mouse.Position;
+                        Instruction = Strings.common.ThrowItem;
+                        await Copy();
+                    }
                 }
-            }
 
-            if (ItemPos.Distance2D(mouse.Position) > 100)
-            {
-                ModuleState = State.Done;
-            }
-            else if (ModuleState == State.ReadyToPaste)
-            {
-                ModuleState = State.Dragging;
+                if (ItemPos.Distance2D(mouse.Position) > 100)
+                {
+                    ModuleState = State.Done;
+                }
+                else if (ModuleState == State.ReadyToPaste)
+                {
+                    ModuleState = State.Dragging;
+                }
             }
         }
 
@@ -228,6 +234,9 @@ namespace Kenedia.Modules.QoL.SubModules
             ToggleModule_Key.Value.Enabled = false;
             ToggleModule_Key.Value.Activated -= ToggleModule_Key_Activated;
 
+            InputService.Input.Mouse.LeftMouseButtonPressed -= Mouse_LeftMouseButtonPressed;
+            InputService.Input.Mouse.LeftMouseButtonReleased -= Mouse_LeftMouseButtonReleased;
+
             base.Dispose();
         }
 
@@ -274,7 +283,7 @@ namespace Kenedia.Modules.QoL.SubModules
 
             var text = await ClipboardUtil.WindowsClipboardService.GetTextAsync();
 
-            if (text.Length > 0)
+            if (text != null && text.Length > 0)
             {
                 text = text.StartsWith("[") ? text.Substring(1, text.Length - 1) : text;
                 text = text.EndsWith("]") ? text.Substring(0, text.Length - 1) : text;

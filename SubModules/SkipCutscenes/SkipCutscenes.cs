@@ -124,16 +124,19 @@ namespace Kenedia.Modules.QoL.SubModules
 
         private void CurrentMap_MapChanged(object sender, ValueEventArgs<int> e)
         {
-            MumbleTick = GameService.Gw2Mumble.Tick;
-
-            var p = GameService.Gw2Mumble.PlayerCharacter.Position;
-            PPos = p;
-
-            if (IntroCutscene && StarterMaps.Contains(GameService.Gw2Mumble.CurrentMap.Id))
+            if (Active)
             {
-                Ticks.global = Ticks.global + 1250;
-                CutsceneState = CinematicState.InitialSleep;
-                ModuleState = State.Ready;
+                MumbleTick = GameService.Gw2Mumble.Tick;
+
+                var p = GameService.Gw2Mumble.PlayerCharacter.Position;
+                PPos = p;
+
+                if (IntroCutscene && StarterMaps.Contains(GameService.Gw2Mumble.CurrentMap.Id))
+                {
+                    Ticks.global = Ticks.global + 1250;
+                    CutsceneState = CinematicState.InitialSleep;
+                    ModuleState = State.Ready;
+                }
             }
         }
 
@@ -144,15 +147,17 @@ namespace Kenedia.Modules.QoL.SubModules
 
         private void Cancel_Key_Activated(object sender, EventArgs e)
         {
-            Ticks.global += 2500;
-            ClickAgain = false;
-            SleptBeforeClick = false;
-            MumbleTick = GameService.Gw2Mumble.Tick + 5;
+            if (Active)
+            {
+                Ticks.global += 2500;
+                ClickAgain = false;
+                SleptBeforeClick = false;
+                MumbleTick = GameService.Gw2Mumble.Tick + 5;
+            }
         }
 
         public override void LoadData()
         {
-
             Loaded = true;
         }
 
@@ -187,6 +192,11 @@ namespace Kenedia.Modules.QoL.SubModules
 
                 if (!_inGame && (Mumble.Tick > MumbleTick || CutsceneState != CinematicState.Done))
                 {
+                    //ScreenNotification.ShowNotification("CutsceneState: " + CutsceneState.ToString());
+                    //QoL.Logger.Debug("CutsceneState: " + CutsceneState.ToString());
+                    //ScreenNotification.ShowNotification("ModuleState: " + ModuleState.ToString());
+                    //QoL.Logger.Debug("ModuleState: " + ModuleState.ToString());
+
                     if (CutsceneState == CinematicState.Clicked_Once)
                     {
                         Ticks.global = gameTime.TotalGameTime.TotalMilliseconds + 2500;

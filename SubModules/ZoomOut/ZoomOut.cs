@@ -160,9 +160,13 @@ namespace Kenedia.Modules.QoL.SubModules
         }
         public override void Dispose()
         {
+            var Mumble = GameService.Gw2Mumble;
+
             ToggleModule_Key.Value.Activated -= ToggleModule_Key_Activated;
             ManualMaxZoomOut.Value.Activated -= ManualMaxZoomOut_Triggered;
             InputService.Input.Mouse.MouseWheelScrolled -= Mouse_MouseWheelScrolled;
+            Mumble.PlayerCharacter.NameChanged -= PlayerCharacter_NameChanged;
+            Mumble.CurrentMap.MapChanged -= CurrentMap_MapChanged;
 
             base.Dispose();
         }
