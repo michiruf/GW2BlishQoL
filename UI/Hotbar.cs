@@ -57,6 +57,20 @@ namespace Kenedia.Modules.QoL.UI
 
     public class Hotbar : Container
     {
+        class Sizes
+        {
+            public Point Collapsed = Point.Zero;
+            public Point Expanded = Point.Zero;
+            public Point Delta = Point.Zero;
+            public bool isExpanded = false;
+            public Point Size
+            {
+                get
+                {
+                    return isExpanded ? Expanded : Collapsed;
+                }
+            }
+        }
 
         List<Hotbar_Button> SubControls = new List<Hotbar_Button>();
         FlowPanel FlowPanel;
@@ -65,19 +79,69 @@ namespace Kenedia.Modules.QoL.UI
         AsyncTexture2D Expand;
         AsyncTexture2D Expand_Hovered;
 
-        ExpandDirection ExpandDirection;
+        event EventHandler ExpandDirectionChanged;
+        ExpandDirection _ExpandDirection;
+        public ExpandDirection ExpandDirection
+        {
+            get => _ExpandDirection;
+            set
+            {
+                OnExpandDirectionChanged(this, null);
+                if (value != _ExpandDirection)
+                {
+                    if (FlowPanel != null)
+                    {
+                        switch (value)
+                        {
+                            case ExpandDirection.LeftToRight:
+                                FlowPanel.FlowDirection = ControlFlowDirection.SingleLeftToRight;
+                                FlowPanel.Location = new Point(0,0);
+                                break;
+
+                            case ExpandDirection.RightToLeft:
+                                FlowPanel.FlowDirection = ControlFlowDirection.SingleRightToLeft;
+                                FlowPanel.Location = new Point(ExpanderSize.X, 0);
+                                break;
+
+                            case ExpandDirection.TopToBottom:
+                                FlowPanel.FlowDirection = ControlFlowDirection.SingleTopToBottom;
+                                FlowPanel.Location = new Point(0,0);
+                                break;
+
+                            case ExpandDirection.BottomToTop:
+                                FlowPanel.FlowDirection = ControlFlowDirection.SingleBottomToTop;
+                                FlowPanel.Location = new Point(0, ExpanderSize.X);
+                                break;
+                        }
+
+                    }
+
+                    _ExpandDirection = value;
+                    AdjustSize();
+                }
+            }
+        }
+
+        Sizes FlowPanelSizes = new Sizes();
+        Sizes HotBarSizes = new Sizes();
+
 
         bool Expanded;
         bool Dragging;
         Point DraggingStart;
         Point DraggingDestination;
 
+        int BtnPadding = 8;
+        public Point CollapsedSize
+        {
+            get => HotBarSizes.Collapsed;
+        }
         public Point ButtonSize = new Point(24, 24);
         Point ExpanderSize = new Point(32, 32);
 
         Rectangle ExpanderBounds = new Rectangle(0, 0, 32, 32);
-        Rectangle TotalBounds = new Rectangle(0, 0, 32, 32);
         Point _PreSize = Point.Zero;
+        Point _PreLocation = Point.Zero;
 
         public Hotbar()
         {
@@ -85,7 +149,6 @@ namespace Kenedia.Modules.QoL.UI
             Background = texture.GetRegion(25, 25, texture.Width - 25, texture.Height - 25);
             Expand = QoL.ModuleInstance.TextureManager.getIcon(_Icons.Expand);
             Expand_Hovered = QoL.ModuleInstance.TextureManager.getIcon(_Icons.Expand_Hovered);
-            ExpandDirection = ExpandDirection.LeftToRight;
             FlowPanel = new FlowPanel()
             {
                 Parent = this,
@@ -94,6 +157,20 @@ namespace Kenedia.Modules.QoL.UI
                 FlowDirection = ControlFlowDirection.LeftToRight,
                 Location = new Point(0, 0),
             };
+
+            FlowPanelSizes.Collapsed = FlowPanel.Size;
+            FlowPanelSizes.Expanded = FlowPanel.Size;
+
+            HotBarSizes.Collapsed = Size;
+            HotBarSizes.Expanded = Size;
+
+            ExpandDirection = ExpandDirection.BottomToTop;
+        }
+
+        void OnExpandDirectionChanged(object sender, EventArgs e)
+        {
+            this.ExpandDirectionChanged?.Invoke(this, EventArgs.Empty);
+            AdjustSize();
         }
 
         public void AddButton(Hotbar_Button btn)
@@ -105,19 +182,92 @@ namespace Kenedia.Modules.QoL.UI
             btn.SubModule.Toggled += SubModule_Toggled;
             SubControls.Add(btn);
 
-            FlowPanel.Size = new Point((int) (FlowPanel.OuterControlPadding.X *2) + SubControls.Count * (ButtonSize.X + (int) FlowPanel.ControlPadding.X), Height);
-            TotalBounds = new Rectangle(Point.Zero, new Point(ExpanderSize.X + (SubControls.Count * ((int)(FlowPanel.ControlPadding.X) + ButtonSize.X)), Height));
+            AdjustSize();
 
             SubModule_Toggled(null, null);
         }
 
+        void AdjustSize()
+        {
+            var size = ExpanderSize.X + (BtnPadding / 2);
+            var visible = SubControls.Where(e => e.SubModule.Active).Count();
+
+            switch (ExpandDirection)
+            {
+                case ExpandDirection.LeftToRight:
+                    FlowPanelSizes.Collapsed = new Point(visible * (ButtonSize.X + (int)FlowPanel.ControlPadding.X), ExpanderSize.X);
+                    FlowPanelSizes.Expanded = new Point(SubControls.Count * (ButtonSize.X + (int)FlowPanel.ControlPadding.X), ExpanderSize.X);
+                    FlowPanelSizes.Delta = new Point(FlowPanelSizes.Expanded.X - FlowPanelSizes.Collapsed.X, FlowPanelSizes.Expanded.Y - FlowPanelSizes.Collapsed.Y);
+
+                    HotBarSizes.Collapsed = new Point(ExpanderSize.X + FlowPanelSizes.Collapsed.X, size);
+                    HotBarSizes.Expanded = new Point(ExpanderSize.X + FlowPanelSizes.Expanded.X, size);
+                    HotBarSizes.Delta = new Point(HotBarSizes.Expanded.X - HotBarSizes.Collapsed.X, HotBarSizes.Expanded.Y - HotBarSizes.Collapsed.Y);
+                    break;
+
+                case ExpandDirection.RightToLeft:
+                    FlowPanelSizes.Collapsed = new Point(visible * (ButtonSize.X + (int)FlowPanel.ControlPadding.X), size);
+                    FlowPanelSizes.Expanded = new Point(SubControls.Count * (ButtonSize.X + (int)FlowPanel.ControlPadding.X), size);
+                    FlowPanelSizes.Delta = new Point(FlowPanelSizes.Expanded.X - FlowPanelSizes.Collapsed.X, FlowPanelSizes.Expanded.Y - FlowPanelSizes.Collapsed.Y);
+
+                    HotBarSizes.Collapsed = new Point(ExpanderSize.X + FlowPanelSizes.Collapsed.X, size);
+                    HotBarSizes.Expanded = new Point(ExpanderSize.X + FlowPanelSizes.Expanded.X, size);
+                    HotBarSizes.Delta = new Point(HotBarSizes.Expanded.X - HotBarSizes.Collapsed.X, HotBarSizes.Expanded.Y - HotBarSizes.Collapsed.Y);
+                    break;
+
+                case ExpandDirection.TopToBottom:
+                    FlowPanelSizes.Collapsed = new Point(size, visible * (ButtonSize.Y + (int)FlowPanel.ControlPadding.Y));
+                    FlowPanelSizes.Expanded = new Point(size, SubControls.Count * (ButtonSize.Y + (int)FlowPanel.ControlPadding.Y));
+                    FlowPanelSizes.Delta = new Point(FlowPanelSizes.Expanded.X - FlowPanelSizes.Collapsed.X, FlowPanelSizes.Expanded.Y - FlowPanelSizes.Collapsed.Y);
+
+                    HotBarSizes.Collapsed = new Point(size, ExpanderSize.Y + FlowPanelSizes.Collapsed.Y);
+                    HotBarSizes.Expanded = new Point(size, ExpanderSize.Y + FlowPanelSizes.Expanded.Y);
+                    HotBarSizes.Delta = new Point(HotBarSizes.Expanded.X - HotBarSizes.Collapsed.X, HotBarSizes.Expanded.Y - HotBarSizes.Collapsed.Y);
+                    break;
+
+                case ExpandDirection.BottomToTop:
+                    FlowPanelSizes.Collapsed = new Point(size, visible * (ButtonSize.Y + (int)FlowPanel.ControlPadding.Y));
+                    FlowPanelSizes.Expanded = new Point(size, SubControls.Count * (ButtonSize.Y + (int)FlowPanel.ControlPadding.Y));
+                    FlowPanelSizes.Delta = new Point(FlowPanelSizes.Expanded.X - FlowPanelSizes.Collapsed.X, FlowPanelSizes.Expanded.Y - FlowPanelSizes.Collapsed.Y);
+
+                    HotBarSizes.Collapsed = new Point(size, ExpanderSize.Y + FlowPanelSizes.Collapsed.Y);
+                    HotBarSizes.Expanded = new Point(size, ExpanderSize.Y + FlowPanelSizes.Expanded.Y);
+                    HotBarSizes.Delta = new Point(HotBarSizes.Expanded.X - HotBarSizes.Collapsed.X, HotBarSizes.Expanded.Y - HotBarSizes.Collapsed.Y);
+                    break;
+            }
+        }
+
         private void SubModule_Toggled(object sender, EventArgs e)
         {
-            var active = SubControls.Where(btn => btn.SubModule != null && btn.SubModule.Active).Count();
             FlowPanel.SortChildren<Hotbar_Button>((a, b) => (b.Visible.CompareTo(a.Visible)));
+            var submodule = (SubModule)sender;
 
-            Size = new Point(ExpanderSize.X + (active * ((int)(FlowPanel.ControlPadding.X) + ButtonSize.X)), Height);
-            _PreSize = Size;
+            if (_PreLocation != Point.Zero && MouseOver)
+            {
+                switch (submodule.Active)
+                {
+                    case true:
+                        if (ExpandDirection == ExpandDirection.BottomToTop)
+                        {
+                            _PreLocation = new Point(_PreLocation.X, _PreLocation.Y - (ButtonSize.Y + (int)FlowPanel.ControlPadding.Y));
+                        }
+                        else if (ExpandDirection == ExpandDirection.RightToLeft)
+                        {
+                            _PreLocation = new Point(_PreLocation.X - (ButtonSize.X + (int)FlowPanel.ControlPadding.X), _PreLocation.Y);
+                        }
+                        break;
+
+                    case false:
+                        if (ExpandDirection == ExpandDirection.BottomToTop)
+                        {
+                            _PreLocation = new Point(_PreLocation.X, _PreLocation.Y + (ButtonSize.Y + (int)FlowPanel.ControlPadding.Y));
+                        }
+                        else if (ExpandDirection == ExpandDirection.RightToLeft)
+                        {
+                            _PreLocation = new Point(_PreLocation.X + (ButtonSize.X + (int)FlowPanel.ControlPadding.X), _PreLocation.Y);
+                        }
+                        break;
+                }
+            }
         }
 
         public void RemoveButton(Hotbar_Button btn)
@@ -144,38 +294,77 @@ namespace Kenedia.Modules.QoL.UI
         {
             base.UpdateContainer(gameTime);
 
-            if (Dragging)
-            {
-                Location = Input.Mouse.Position.Add(new Point(-DraggingStart.X, -DraggingStart.Y));
-            }
+            Dragging = Dragging && MouseOver;
 
             Expanded = MouseOver || FlowPanel.MouseOver || Input.Keyboard.ActiveModifiers == Microsoft.Xna.Framework.Input.ModifierKeys.Alt;
+            FlowPanelSizes.isExpanded = Expanded;
+            HotBarSizes.isExpanded = Expanded;
+
+            AdjustSize();
+
+            if (Dragging)
+            {
+                if (ExpandDirection == ExpandDirection.RightToLeft)
+                {
+                    Location = Input.Mouse.Position.Add(new Point(-DraggingStart.X, -DraggingStart.Y));
+                    _PreLocation = Input.Mouse.Position.Add(new Point(-DraggingStart.X + HotBarSizes.Delta.X, -DraggingStart.Y));
+                }
+                else
+                {
+                    Location = Input.Mouse.Position.Add(new Point(-DraggingStart.X, -DraggingStart.Y));
+                    _PreLocation = Input.Mouse.Position.Add(new Point(-DraggingStart.X, -DraggingStart.Y + HotBarSizes.Delta.Y));
+                }
+            }
+
             if (Expanded)
             {
-
-                if (TotalBounds.Size != Size)
+                if (HotBarSizes.Size != Size)
                 {
-                    _PreSize = _PreSize == Point.Zero ? Size : _PreSize;
-                    Size = TotalBounds.Size;
+                    _PreLocation = _PreLocation == Point.Zero ? Location : _PreLocation;
 
                     foreach (Hotbar_Button btn in SubControls)
                     {
                         btn.Visible = true;
                     }
                     FlowPanel.Invalidate();
+
+                    FlowPanel.Size = FlowPanelSizes.Size;
+                    Size = HotBarSizes.Size;
+
+                    if (ExpandDirection == ExpandDirection.BottomToTop)
+                    {
+                        Location = new Point(_PreLocation.X, _PreLocation.Y - HotBarSizes.Delta.Y);
+                    }
+                    else if (ExpandDirection == ExpandDirection.RightToLeft)
+                    {
+                        Location = new Point(_PreLocation.X - HotBarSizes.Delta.X, _PreLocation.Y);
+                    }
                 }
             }
-            else if (_PreSize != Point.Zero)
+            else if (HotBarSizes.Size != Size)
             {
-                Size = _PreSize;
-                _PreSize = Point.Zero;
-
                 foreach (Hotbar_Button btn in SubControls)
                 {
                     btn.Visible = btn.SubModule.Active;
                 }
                 FlowPanel.SortChildren<Hotbar_Button>((a, b) => (b.Visible.CompareTo(a.Visible)));
                 FlowPanel.Invalidate();
+
+                FlowPanel.Size = FlowPanelSizes.Size;
+                Size = HotBarSizes.Size;
+
+                if (_PreLocation != Point.Zero)
+                {
+                    if (ExpandDirection == ExpandDirection.BottomToTop)
+                    {
+                        Location = _PreLocation;
+                    }
+                    else if (ExpandDirection == ExpandDirection.RightToLeft)
+                    {
+                        Location = _PreLocation;
+                    }
+                    _PreLocation = Point.Zero;
+                }
             }
         }
 
@@ -184,7 +373,33 @@ namespace Kenedia.Modules.QoL.UI
             base.PaintBeforeChildren(spriteBatch, bounds);
 
             var pad = 8;
-            ExpanderBounds = new Rectangle(bounds.Right -  bounds.Height + pad, bounds.Y + (pad / 2), bounds.Height - pad, bounds.Height - pad);
+            float rotation = 0f;
+            var expanderSize = ExpanderSize.X;
+
+            switch (ExpandDirection)
+            {
+                case ExpandDirection.LeftToRight:
+                    ExpanderBounds = new Rectangle(bounds.Right - expanderSize + 6, bounds.Y + 6, expanderSize - pad, expanderSize - pad);
+                    rotation = 0f;
+                    break;
+
+                case ExpandDirection.RightToLeft:
+                    ExpanderBounds = new Rectangle(bounds.Left + expanderSize - (pad / 2), bounds.Y + expanderSize - 2, expanderSize - pad, expanderSize - pad);
+                    rotation = 3.15f;
+                    break;
+
+                case ExpandDirection.TopToBottom:
+                    ExpanderBounds = new Rectangle(expanderSize - 2, Height - expanderSize + (pad / 2), expanderSize - pad, expanderSize - pad);
+                    rotation = 1.55f;
+                    break;
+
+                case ExpandDirection.BottomToTop:
+                    ExpanderBounds = new Rectangle(6, expanderSize - 4, expanderSize - pad, expanderSize - pad);
+                    rotation = -1.55f;
+
+                    break;
+
+            }
 
             spriteBatch.DrawOnCtrl(this,
                                 Background,
@@ -199,7 +414,7 @@ namespace Kenedia.Modules.QoL.UI
                                 ExpanderBounds,
                                 Expand.Texture.Bounds,
                                 Color.White,
-                                0f,
+                                rotation,
                                 default);
 
             var color = Color.Black;
@@ -233,7 +448,7 @@ namespace Kenedia.Modules.QoL.UI
 
             foreach (Hotbar_Button btn in SubControls)
             {
-                if(btn.SubModule != null) btn.SubModule.Toggled -= SubModule_Toggled;
+                if (btn.SubModule != null) btn.SubModule.Toggled -= SubModule_Toggled;
             }
 
             SubControls?.Clear();

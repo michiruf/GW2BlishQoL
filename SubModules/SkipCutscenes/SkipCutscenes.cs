@@ -80,9 +80,6 @@ namespace Kenedia.Modules.QoL.SubModules
 
             ModuleIcon_Active = QoL.ModuleInstance.TextureManager.getIcon("SkipCutscenes", _Icons.ModuleIcon_Active);
             ModuleIconHovered_Active = QoL.ModuleInstance.TextureManager.getIcon("SkipCutscenes", _Icons.ModuleIcon_Active_HoveredWhite);
-
-            Initialize();
-            LoadData();
         }
 
 
@@ -102,6 +99,14 @@ namespace Kenedia.Modules.QoL.SubModules
 
             ToggleModule_Key.Value.Enabled = true;
             ToggleModule_Key.Value.Activated += ToggleModule_Key_Activated;
+
+            Enabled = settings.DefineSetting(Name + nameof(Enabled),
+                                                      true,
+                                                      () => string.Format("Enable {0}", Name));
+
+            ShowOnBar = settings.DefineSetting(Name + nameof(ShowOnBar),
+                                                      true,
+                                                      () => string.Format("Show Icon", Name));
         }
 
         public override void ToggleModule()
@@ -115,7 +120,9 @@ namespace Kenedia.Modules.QoL.SubModules
             base.Initialize();
 
             GameService.Gw2Mumble.CurrentMap.MapChanged += CurrentMap_MapChanged;
-            GameService.Gw2Mumble.PlayerCharacter.NameChanged += PlayerCharacter_NameChanged; ;
+            GameService.Gw2Mumble.PlayerCharacter.NameChanged += PlayerCharacter_NameChanged;
+
+            LoadData();
         }
         private void PlayerCharacter_NameChanged(object sender, ValueEventArgs<string> e)
         {

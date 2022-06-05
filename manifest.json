@@ -1,11 +1,11 @@
 {
   "name": "Tyrian QoL",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "namespace": "Kenedia.Modules.QoL",
   "package": "QoL.dll",
   "manifest_version": 1,
 
-  "description": "A collection of smaller Quality of Life features!",
+  "description": "A collection of smaller Quality of Life features!\n\nAll UI Controls can be moved with 'ALT + Left Click & Drag'.'",
   "dependencies": {
     "bh.blishhud": ">=0.11.7"
   },

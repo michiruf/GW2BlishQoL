@@ -53,6 +53,8 @@ namespace Kenedia.Modules.QoL.Classes
         public event EventHandler Toggled;
 
         public SettingEntry<Blish_HUD.Input.KeyBinding> ToggleModule_Key;
+        public SettingEntry<bool> Enabled;
+        public SettingEntry<bool> ShowOnBar;
         public SettingEntry<bool> _Active;
 
         public Ticks Ticks = new Ticks();
@@ -77,11 +79,14 @@ namespace Kenedia.Modules.QoL.Classes
         public abstract void LoadData();
         public virtual void ToggleModule()
         {
-            Active = !Active;
+            if (Enabled.Value)
+            {
+                Active = !Active;
 
-            ScreenNotification.ShowNotification(string.Format(Strings.common.RunStateChange, Name, !Active ? Strings.common.Deactivated : Strings.common.Activated), ScreenNotification.NotificationType.Warning);
+                ScreenNotification.ShowNotification(string.Format(Strings.common.RunStateChange, Name, !Active ? Strings.common.Deactivated : Strings.common.Activated), ScreenNotification.NotificationType.Warning);
 
-            this.Toggled?.Invoke(this, EventArgs.Empty);
+                this.Toggled?.Invoke(this, EventArgs.Empty);
+            }
         }
 
         public abstract void Update(GameTime gameTime);

@@ -51,6 +51,7 @@ namespace Kenedia.Modules.QoL
                 new ItemDestruction(),
                 new SkipCutscenes(),
                 new ZoomOut(),
+                new Resets(),
             };
         }
 
@@ -64,6 +65,9 @@ namespace Kenedia.Modules.QoL
         public List<SubModule> Modules;
 
         public SettingEntry<Blish_HUD.Input.KeyBinding> ReloadKey;
+        public SettingEntry<ExpandDirection> HotbarExpandDirection;
+        public SettingEntry<Point> HotbarPosition;
+        public SettingEntry<bool> HotbarForceOnScreen;
 
         private bool _DataLoaded;
         public bool FetchingAPI;
@@ -97,6 +101,16 @@ namespace Kenedia.Modules.QoL
                 module.DefineSettings(subSettings);
             }
 
+            HotbarForceOnScreen = settings.DefineSetting(nameof(HotbarForceOnScreen),
+                                                      true,
+                                                      () => "Force Hotbar on Screen",
+                                                      () => "When the Hotbar is moved outside the game bounds the bar gets moved back inside.");
+
+            HotbarExpandDirection = settings.DefineSetting(nameof(HotbarExpandDirection),
+                                                      ExpandDirection.LeftToRight,
+                                                      () => "Expand Direction",
+                                                      () => "Direction the Hotbar is supposed to expand.");
+            HotbarExpandDirection.SettingChanged += HotbarExpandDirection_SettingChanged;
 
             var internal_settings = settings.AddSubCollection("Internal Settings", false);
             ReloadKey = internal_settings.DefineSetting(nameof(ReloadKey),
@@ -106,6 +120,13 @@ namespace Kenedia.Modules.QoL
 
             ReloadKey.Value.Enabled = true;
             ReloadKey.Value.Activated += RebuildUI;
+
+            HotbarPosition = internal_settings.DefineSetting(nameof(HotbarPosition), new Point(0, 34));
+        }
+
+        private void HotbarExpandDirection_SettingChanged(object sender, ValueChangedEventArgs<ExpandDirection> e)
+        {
+            Hotbar.ExpandDirection = e.NewValue;
         }
 
         protected override void Initialize()
@@ -132,7 +153,23 @@ namespace Kenedia.Modules.QoL
             // Base handler must be called
             base.OnModuleLoaded(e);
 
+            foreach (SubModule module in Modules)
+            {
+                if (module.Enabled.Value)
+                {
+                    module.Initialize();
+                }
+            }
+
+            var Mumble = GameService.Gw2Mumble;
+            Mumble.UI.UISizeChanged += UI_UISizeChanged;
+
             LoadData();
+        }
+
+        private void UI_UISizeChanged(object sender, ValueEventArgs<Gw2Sharp.Mumble.Models.UiSize> e)
+        {
+            EnsureHotbarOnScreen();
         }
 
         private void QoL_DataLoaded_Event(object sender, EventArgs e)
@@ -152,9 +189,12 @@ namespace Kenedia.Modules.QoL
                 Ticks.global = gameTime.TotalGameTime.TotalMilliseconds;
                 foreach (SubModule module in Modules)
                 {
-                    if (module.Loaded && module.Active)
+                    if (module.Enabled.Value)
                     {
-                        module.Update(gameTime);
+                        if (module.Loaded && module.Active)
+                        {
+                            module.Update(gameTime);
+                        }
                     }
                 }
             }
@@ -216,21 +256,48 @@ namespace Kenedia.Modules.QoL
             Hotbar = new Hotbar()
             {
                 Parent = GameService.Graphics.SpriteScreen,
-                Location = new Point(0, 34),
                 Size = new Point(36, 36),
-                ButtonSize = new Point(28, 28)
+                ButtonSize = new Point(28, 28),
+                ExpandDirection = HotbarExpandDirection.Value,
+                Location = HotbarPosition.Value,
             };
 
             foreach (SubModule module in Modules)
             {
-                module.Hotbar_Button = new Hotbar_Button()
+                if (module.Enabled.Value && module.ShowOnBar.Value)
                 {
-                    SubModule = module,
-                    BasicTooltipText = string.Format(Strings.common.Toggle, $"{module.Name}"),
-                };
+                    module.Hotbar_Button = new Hotbar_Button()
+                    {
+                        SubModule = module,
+                        BasicTooltipText = string.Format(Strings.common.Toggle, $"{module.Name}"),
+                    };
 
-                Hotbar.AddButton(module.Hotbar_Button);
+                    Hotbar.AddButton(module.Hotbar_Button);
+                }
             }
+
+            Hotbar.Moved += Hotbar_Moved;
+        }
+
+        private void Hotbar_Moved(object sender, MovedEventArgs e)
+        {
+            EnsureHotbarOnScreen();
+        }
+
+        void EnsureHotbarOnScreen()
+        {
+            GameService.Graphics.QueueMainThreadRender((graphicsDevice) =>
+            {
+                var bounds = GameService.Graphics.SpriteScreen.LocalBounds;
+                if (!HotbarForceOnScreen.Value || bounds.Contains(Hotbar.Location) && bounds.Contains(Hotbar.Location.Add(Hotbar.Size)))
+                {
+                    HotbarPosition.Value = Hotbar.Location;
+                }
+                else
+                {
+                    Hotbar.Location = new Point(Math.Max(0, Math.Min(bounds.Right - Hotbar.CollapsedSize.X, Hotbar.Location.X)), Math.Max(0, Math.Min(bounds.Bottom - Hotbar.CollapsedSize.Y, Hotbar.Location.Y)));
+                }
+            });
         }
     }
 }

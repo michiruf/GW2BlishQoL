@@ -24,6 +24,8 @@ namespace Kenedia.Modules.QoL
         ModuleIcon_Active_HoveredWhite,
         Expand,
         Expand_Hovered,
+        TyriaDayNight,
+        Calendar,
     }
     public enum _Emblems
     {

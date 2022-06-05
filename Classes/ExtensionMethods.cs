@@ -32,6 +32,10 @@ namespace Kenedia.Modules.QoL
         {
             return new Point((int)(p.X * factor), (int)(p.Y * factor));
         }
+        public static string ConvertToString(this Point p)
+        {
+            return string.Format("X: {0}, Y: {1}", p.X, p.Y);
+        }
     }
 
     internal static class RectangleExtensions

@@ -65,7 +65,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Classes\AsyncHelper.cs" />
+    <Compile Include="Classes\CustomFlowPanel.cs" />
     <Compile Include="Classes\ExtensionMethods.cs" />
+    <Compile Include="Classes\IconLabel.cs" />
     <Compile Include="Classes\SubModule.cs" />
     <Compile Include="Classes\TextureManager.cs" />
     <Compile Include="Classes\Ticks.cs" />
@@ -78,6 +80,7 @@
     </Compile>
     <Compile Include="SubModules\ItemDesctruction\Controls\CursorIcon.cs" />
     <Compile Include="SubModules\ItemDesctruction\ItemDesctruction.cs" />
+    <Compile Include="SubModules\Resets\Resets.cs" />
     <Compile Include="SubModules\SkipCutscenes\SkipCutscenes.cs" />
     <Compile Include="SubModules\ZoomOut\ZoomOut.cs" />
     <Compile Include="UI\Hotbar.cs" />

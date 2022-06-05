@@ -31,9 +31,6 @@ namespace Kenedia.Modules.QoL.SubModules
 
             ModuleIcon_Active = QoL.ModuleInstance.TextureManager.getIcon("ZoomOut", _Icons.ModuleIcon_Active);
             ModuleIconHovered_Active = QoL.ModuleInstance.TextureManager.getIcon("ZoomOut", _Icons.ModuleIcon_Active_HoveredWhite);
-
-            Initialize();
-            LoadData();
         }
 
         public override void DefineSettings(SettingCollection settings)
@@ -65,6 +62,14 @@ namespace Kenedia.Modules.QoL.SubModules
 
             ToggleModule_Key.Value.Enabled = true;
             ToggleModule_Key.Value.Activated += ToggleModule_Key_Activated;
+
+            Enabled = settings.DefineSetting(Name + nameof(Enabled),
+                                                      true,
+                                                      () => string.Format("Enable {0}", Name));
+
+            ShowOnBar = settings.DefineSetting(Name + nameof(ShowOnBar),
+                                                      true,
+                                                      () => string.Format("Show Icon", Name));
         }
 
         private void ToggleModule_Key_Activated(object sender, EventArgs e)
@@ -86,6 +91,8 @@ namespace Kenedia.Modules.QoL.SubModules
             var Mumble = GameService.Gw2Mumble;
             Mumble.CurrentMap.MapChanged += CurrentMap_MapChanged;
             Mumble.PlayerCharacter.NameChanged += PlayerCharacter_NameChanged;
+
+            LoadData();
         }
 
         private void PlayerCharacter_NameChanged(object sender, ValueEventArgs<string> e)

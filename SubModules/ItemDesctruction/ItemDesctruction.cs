@@ -56,9 +56,6 @@ namespace Kenedia.Modules.QoL.SubModules
 
             ModuleIcon_Active = QoL.ModuleInstance.TextureManager.getIcon("ItemDestruction", _Icons.ModuleIcon_Active);
             ModuleIconHovered_Active = QoL.ModuleInstance.TextureManager.getIcon("ItemDestruction", _Icons.ModuleIcon_Active_HoveredWhite);
-
-            Initialize();
-            LoadData();
         }
         public override void DefineSettings(SettingCollection settings)
         {
@@ -77,6 +74,14 @@ namespace Kenedia.Modules.QoL.SubModules
 
             ToggleModule_Key.Value.Enabled = true;
             ToggleModule_Key.Value.Activated += ToggleModule_Key_Activated;
+
+            Enabled = settings.DefineSetting(Name + nameof(Enabled),
+                                                      true,
+                                                      () => string.Format("Enable {0}", Name));
+
+            ShowOnBar = settings.DefineSetting(Name + nameof(ShowOnBar),
+                                                      true,
+                                                      () => string.Format("Show Icon", Name));
         }
 
         private void ToggleModule_Key_Activated(object sender, EventArgs e)
@@ -87,9 +92,11 @@ namespace Kenedia.Modules.QoL.SubModules
         public override void ToggleModule()
         {
             base.ToggleModule();
-
-            CursorIcon.Visible = Active;
-            DeleteIndicator?.Hide();
+            if (Loaded)
+            {
+                CursorIcon.Visible = Active;
+                DeleteIndicator?.Hide();
+            }
         }
 
         public override void Initialize()
@@ -130,6 +137,8 @@ namespace Kenedia.Modules.QoL.SubModules
 
             InputService.Input.Mouse.LeftMouseButtonPressed += Mouse_LeftMouseButtonPressed;
             InputService.Input.Mouse.LeftMouseButtonReleased += Mouse_LeftMouseButtonReleased;
+
+            LoadData();
         }
 
         private async void Mouse_LeftMouseButtonReleased(object sender, Blish_HUD.Input.MouseEventArgs e)
