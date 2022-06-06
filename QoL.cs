@@ -103,20 +103,17 @@ namespace Kenedia.Modules.QoL
 
             HotbarForceOnScreen = settings.DefineSetting(nameof(HotbarForceOnScreen),
                                                       true,
-                                                      () => "Force Hotbar on Screen",
-                                                      () => "When the Hotbar is moved outside the game bounds the bar gets moved back inside.");
+                                                      () => Strings.common.ForceOnScreen_Name,
+                                                      () => Strings.common.ForceOnScreen_Tooltip);
 
             HotbarExpandDirection = settings.DefineSetting(nameof(HotbarExpandDirection),
                                                       ExpandDirection.LeftToRight,
-                                                      () => "Expand Direction",
-                                                      () => "Direction the Hotbar is supposed to expand.");
+                                                      () => Strings.common.ExpandDirection_Name,
+                                                      () => Strings.common.ExpandDirection_Tooltip);
             HotbarExpandDirection.SettingChanged += HotbarExpandDirection_SettingChanged;
 
             var internal_settings = settings.AddSubCollection("Internal Settings", false);
-            ReloadKey = internal_settings.DefineSetting(nameof(ReloadKey),
-                                                      new Blish_HUD.Input.KeyBinding(Keys.None),
-                                                      () => "Reload Button",
-                                                      () => "");
+            ReloadKey = internal_settings.DefineSetting(nameof(ReloadKey), new Blish_HUD.Input.KeyBinding(Keys.None));
 
             ReloadKey.Value.Enabled = true;
             ReloadKey.Value.Activated += RebuildUI;

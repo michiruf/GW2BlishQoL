@@ -65,11 +65,11 @@ namespace Kenedia.Modules.QoL.SubModules
 
             Enabled = settings.DefineSetting(Name + nameof(Enabled),
                                                       true,
-                                                      () => string.Format("Enable {0}", Name));
+                                                      () => string.Format(Strings.common.Enable_Name, Name), () => string.Format(Strings.common.Enable_Tooltip, Name));
 
             ShowOnBar = settings.DefineSetting(Name + nameof(ShowOnBar),
                                                       true,
-                                                      () => string.Format("Show Icon", Name));
+                                                      () => string.Format(Strings.common.ShowIcon_Name, Name), () => string.Format(Strings.common.ShowIcon_Tooltip, Name));
         }
 
         private void ToggleModule_Key_Activated(object sender, EventArgs e)

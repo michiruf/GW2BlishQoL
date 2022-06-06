@@ -129,8 +129,29 @@
   <data name="ClickItem" xml:space="preserve">
     <value>Mayúsculas + clic en un objeto.</value>
   </data>
+  <data name="days" xml:space="preserve">
+    <value>días</value>
+  </data>
   <data name="Deactivated" xml:space="preserve">
     <value>desactivado</value>
+  </data>
+  <data name="Enable_Name" xml:space="preserve">
+    <value>Activar {0}</value>
+  </data>
+  <data name="Enable_Tooltip" xml:space="preserve">
+    <value>Activar y cargar {0}</value>
+  </data>
+  <data name="ExpandDirection_Name" xml:space="preserve">
+    <value>Barra de acceso: Dirección</value>
+  </data>
+  <data name="ExpandDirection_Tooltip" xml:space="preserve">
+    <value>Dirección la barra de acceso se expandirá hasta</value>
+  </data>
+  <data name="ForceOnScreen_Name" xml:space="preserve">
+    <value>Forzar la barra de acceso en la pantalla</value>
+  </data>
+  <data name="ForceOnScreen_Tooltip" xml:space="preserve">
+    <value>Cuando la barra de acceso se mueve fuera de los límites del juego, la barra se mueve de nuevo dentro</value>
   </data>
   <data name="ManualMaxZoomOut_Name" xml:space="preserve">
     <value>Ajustar el zoom máximo</value>
@@ -146,6 +167,12 @@
   </data>
   <data name="ShowCorner_Tooltip" xml:space="preserve">
     <value>Mostrar / Ocultar el icono de la esquina de {0}.</value>
+  </data>
+  <data name="ShowIcon_Name" xml:space="preserve">
+    <value>Mostrar icono</value>
+  </data>
+  <data name="ShowIcon_Tooltip" xml:space="preserve">
+    <value>Mostrar el icono {0} en la barra de acceso directo</value>
   </data>
   <data name="ThrowItem" xml:space="preserve">
     <value>Tira el objeto marcado.</value>

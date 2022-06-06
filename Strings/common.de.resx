@@ -129,8 +129,29 @@
   <data name="ClickItem" xml:space="preserve">
     <value>Shift + Click einen Gegenstand!</value>
   </data>
+  <data name="days" xml:space="preserve">
+    <value>Tage</value>
+  </data>
   <data name="Deactivated" xml:space="preserve">
     <value>deaktiviert</value>
+  </data>
+  <data name="Enable_Name" xml:space="preserve">
+    <value>{0} aktivieren</value>
+  </data>
+  <data name="Enable_Tooltip" xml:space="preserve">
+    <value>{0} aktivieren &amp; laden</value>
+  </data>
+  <data name="ExpandDirection_Name" xml:space="preserve">
+    <value>Schnellzugriffsleiste: Richtung</value>
+  </data>
+  <data name="ExpandDirection_Tooltip" xml:space="preserve">
+    <value>Richtung, in die sich die Zugangsleiste ausdehnen soll</value>
+  </data>
+  <data name="ForceOnScreen_Name" xml:space="preserve">
+    <value>Zugriffsleiste auf dem Bildschirm erzwingen</value>
+  </data>
+  <data name="ForceOnScreen_Tooltip" xml:space="preserve">
+    <value>Wenn die Zugriffsleiste außerhalb der Spielgrenzen verschoben wird, wird die Leiste wieder nach innen verschoben</value>
   </data>
   <data name="ManualMaxZoomOut_Name" xml:space="preserve">
     <value>Set Max Zoom</value>
@@ -146,6 +167,12 @@
   </data>
   <data name="ShowCorner_Tooltip" xml:space="preserve">
     <value>Das Ecksymbol von {0} ein-/ausblenden.</value>
+  </data>
+  <data name="ShowIcon_Name" xml:space="preserve">
+    <value>Icon anzeigen</value>
+  </data>
+  <data name="ShowIcon_Tooltip" xml:space="preserve">
+    <value>Symbol {0} in der Hotbar anzeigen</value>
   </data>
   <data name="ThrowItem" xml:space="preserve">
     <value>Schmeiß den markierten Gegenstand raus!</value>

@@ -97,11 +97,74 @@ namespace Kenedia.Modules.QoL.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to days.
+        /// </summary>
+        internal static string days {
+            get {
+                return ResourceManager.GetString("days", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to deactivated.
         /// </summary>
         internal static string Deactivated {
             get {
                 return ResourceManager.GetString("Deactivated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enable {0}.
+        /// </summary>
+        internal static string Enable_Name {
+            get {
+                return ResourceManager.GetString("Enable_Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enable &amp; Load {0}.
+        /// </summary>
+        internal static string Enable_Tooltip {
+            get {
+                return ResourceManager.GetString("Enable_Tooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Access bar: Direction.
+        /// </summary>
+        internal static string ExpandDirection_Name {
+            get {
+                return ResourceManager.GetString("ExpandDirection_Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Direction the access bar shall expand to.
+        /// </summary>
+        internal static string ExpandDirection_Tooltip {
+            get {
+                return ResourceManager.GetString("ExpandDirection_Tooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Force access bar on screen.
+        /// </summary>
+        internal static string ForceOnScreen_Name {
+            get {
+                return ResourceManager.GetString("ForceOnScreen_Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to When the access bar is moved outside the game bounds the bar gets moved back inside.
+        /// </summary>
+        internal static string ForceOnScreen_Tooltip {
+            get {
+                return ResourceManager.GetString("ForceOnScreen_Tooltip", resourceCulture);
             }
         }
         
@@ -147,6 +210,24 @@ namespace Kenedia.Modules.QoL.Strings {
         internal static string ShowCorner_Tooltip {
             get {
                 return ResourceManager.GetString("ShowCorner_Tooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show Icon.
+        /// </summary>
+        internal static string ShowIcon_Name {
+            get {
+                return ResourceManager.GetString("ShowIcon_Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show {0} Icon on the Hotbar.
+        /// </summary>
+        internal static string ShowIcon_Tooltip {
+            get {
+                return ResourceManager.GetString("ShowIcon_Tooltip", resourceCulture);
             }
         }
         

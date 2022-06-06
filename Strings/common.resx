@@ -129,8 +129,29 @@
   <data name="ClickItem" xml:space="preserve">
     <value>Shift + Click on an Item!</value>
   </data>
+  <data name="days" xml:space="preserve">
+    <value>days</value>
+  </data>
   <data name="Deactivated" xml:space="preserve">
     <value>deactivated</value>
+  </data>
+  <data name="Enable_Name" xml:space="preserve">
+    <value>Enable {0}</value>
+  </data>
+  <data name="Enable_Tooltip" xml:space="preserve">
+    <value>Enable &amp; Load {0}</value>
+  </data>
+  <data name="ExpandDirection_Name" xml:space="preserve">
+    <value>Access bar: Direction</value>
+  </data>
+  <data name="ExpandDirection_Tooltip" xml:space="preserve">
+    <value>Direction the access bar shall expand to</value>
+  </data>
+  <data name="ForceOnScreen_Name" xml:space="preserve">
+    <value>Force access bar on screen</value>
+  </data>
+  <data name="ForceOnScreen_Tooltip" xml:space="preserve">
+    <value>When the access bar is moved outside the game bounds the bar gets moved back inside</value>
   </data>
   <data name="ManualMaxZoomOut_Name" xml:space="preserve">
     <value>Set Max Zoom</value>
@@ -146,6 +167,12 @@
   </data>
   <data name="ShowCorner_Tooltip" xml:space="preserve">
     <value>Show / Hide the Corner Icon of {0}.</value>
+  </data>
+  <data name="ShowIcon_Name" xml:space="preserve">
+    <value>Show Icon</value>
+  </data>
+  <data name="ShowIcon_Tooltip" xml:space="preserve">
+    <value>Show {0} Icon on the Hotbar</value>
   </data>
   <data name="ThrowItem" xml:space="preserve">
     <value>Throw the marked item out!</value>

@@ -129,8 +129,29 @@
   <data name="ClickItem" xml:space="preserve">
     <value>Shift + Click un item !</value>
   </data>
+  <data name="days" xml:space="preserve">
+    <value>jours</value>
+  </data>
   <data name="Deactivated" xml:space="preserve">
     <value>désactivé</value>
+  </data>
+  <data name="Enable_Name" xml:space="preserve">
+    <value>Activer {0}</value>
+  </data>
+  <data name="Enable_Tooltip" xml:space="preserve">
+    <value>Activer et charger {0}</value>
+  </data>
+  <data name="ExpandDirection_Name" xml:space="preserve">
+    <value>Barre d'accès : Direction</value>
+  </data>
+  <data name="ExpandDirection_Tooltip" xml:space="preserve">
+    <value>Direction la Hotbar s'élargira à</value>
+  </data>
+  <data name="ForceOnScreen_Name" xml:space="preserve">
+    <value>Forcer la barre d'accès à l'écran</value>
+  </data>
+  <data name="ForceOnScreen_Tooltip" xml:space="preserve">
+    <value>Lorsque la barre d'accès est déplacée à l'extérieur des limites du jeu, la barre est replacée à l'intérieur.</value>
   </data>
   <data name="ManualMaxZoomOut_Name" xml:space="preserve">
     <value>Set Max Zoom</value>
@@ -146,6 +167,12 @@
   </data>
   <data name="ShowCorner_Tooltip" xml:space="preserve">
     <value>Afficher / masquer l'icône d'angle de {0}.</value>
+  </data>
+  <data name="ShowIcon_Name" xml:space="preserve">
+    <value>Afficher l'icône</value>
+  </data>
+  <data name="ShowIcon_Tooltip" xml:space="preserve">
+    <value>Afficher l'icône {0} dans la barre d'adresse</value>
   </data>
   <data name="String1" xml:space="preserve">
     <value>Permettre le défilement avec la molette de la souris sans déclencher de zoom arrière</value>

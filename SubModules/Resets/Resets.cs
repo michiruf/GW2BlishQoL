@@ -73,11 +73,11 @@ namespace Kenedia.Modules.QoL.SubModules
 
             Enabled = settings.DefineSetting(Name + nameof(Enabled),
                                                       true,
-                                                      () => string.Format("Enable {0}", Name));
+                                                      () => string.Format(Strings.common.Enable_Name, Name), () => string.Format(Strings.common.Enable_Tooltip, Name));
 
             ShowOnBar = settings.DefineSetting(Name + nameof(ShowOnBar),
                                                       true,
-                                                      () => string.Format("Show Icon", Name));
+                                                      () => string.Format(Strings.common.ShowIcon_Name, Name), () => string.Format(Strings.common.ShowIcon_Tooltip, Name));
 
             var internal_settings = settings.AddSubCollection("Internal Settings " + Name, false);
             ControlPosition = internal_settings.DefineSetting(nameof(ControlPosition), new Point(150, 150));
@@ -160,17 +160,17 @@ namespace Kenedia.Modules.QoL.SubModules
             var now = DateTime.UtcNow;
             var nextDay = DateTime.UtcNow.AddDays(1);
             var nextWeek = DateTime.UtcNow;
-            for (int i = 1; i < 7; i++)
+            for (int i = 0; i < 8; i++)
             {
                 nextWeek = DateTime.UtcNow.AddDays(i);
-                if (nextWeek.DayOfWeek == DayOfWeek.Monday) break;
+                if (nextWeek.DayOfWeek == DayOfWeek.Monday && (nextWeek.Day != now.Day || (now.Hour < 7 || now.Hour == 7 && now.Minute < 30))) break;
             }
             var t = new DateTime(nextDay.Year, nextDay.Month, nextDay.Day, 0, 0, 0);
             var w = new DateTime(nextWeek.Year, nextWeek.Month, nextWeek.Day, 7, 30, 0);
 
 
             var weeklyReset = w.Subtract(now);
-            WeeklyReset.Text = string.Format("{0:0} days {1:00}:{2:00}:{3:00}", weeklyReset.Days, weeklyReset.Hours, weeklyReset.Minutes, weeklyReset.Seconds);
+            WeeklyReset.Text = string.Format("{1:0} {0} {2:00}:{3:00}:{4:00}", Strings.common.days, weeklyReset.Days, weeklyReset.Hours, weeklyReset.Minutes, weeklyReset.Seconds);
 
             var serverReset = t.Subtract(now);
             ServerReset.Text = string.Format("{0:00}:{1:00}:{2:00}", serverReset.Hours, serverReset.Minutes, serverReset.Seconds);
