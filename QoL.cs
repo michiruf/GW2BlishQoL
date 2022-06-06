@@ -250,30 +250,33 @@ namespace Kenedia.Modules.QoL
         }
         private void CreateUI()
         {
-            Hotbar = new Hotbar()
+            if (Hotbar == null)
             {
-                Parent = GameService.Graphics.SpriteScreen,
-                Size = new Point(36, 36),
-                ButtonSize = new Point(28, 28),
-                ExpandDirection = HotbarExpandDirection.Value,
-                Location = HotbarPosition.Value,
-            };
-
-            foreach (SubModule module in Modules)
-            {
-                if (module.Enabled.Value && module.ShowOnBar.Value)
+                Hotbar = new Hotbar()
                 {
-                    module.Hotbar_Button = new Hotbar_Button()
+                    Parent = GameService.Graphics.SpriteScreen,
+                    Size = new Point(36, 36),
+                    ButtonSize = new Point(28, 28),
+                    ExpandDirection = HotbarExpandDirection.Value,
+                    Location = HotbarPosition.Value,
+                };
+
+                foreach (SubModule module in Modules)
+                {
+                    if (module.Enabled.Value && module.ShowOnBar.Value)
                     {
-                        SubModule = module,
-                        BasicTooltipText = string.Format(Strings.common.Toggle, $"{module.Name}"),
-                    };
+                        module.Hotbar_Button = new Hotbar_Button()
+                        {
+                            SubModule = module,
+                            BasicTooltipText = string.Format(Strings.common.Toggle, $"{module.Name}"),
+                        };
 
-                    Hotbar.AddButton(module.Hotbar_Button);
+                        Hotbar.AddButton(module.Hotbar_Button);
+                    }
                 }
-            }
 
-            Hotbar.Moved += Hotbar_Moved;
+                Hotbar.Moved += Hotbar_Moved;
+            }
         }
 
         private void Hotbar_Moved(object sender, MovedEventArgs e)

@@ -1,6 +1,6 @@
 {
   "name": "Tyrian QoL",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "namespace": "Kenedia.Modules.QoL",
   "package": "QoL.dll",
   "manifest_version": 1,

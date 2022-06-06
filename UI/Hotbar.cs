@@ -31,14 +31,16 @@ namespace Kenedia.Modules.QoL.UI
             var texture = SubModule.Active ? SubModule.ModuleIcon_Active : SubModule.ModuleIcon;
             if (MouseOver) texture = SubModule.Active ? SubModule.ModuleIconHovered_Active : SubModule.ModuleIconHovered;
 
-            spriteBatch.DrawOnCtrl(this,
-                                texture,
-                                bounds,
-                                SubModule.ModuleIcon.Bounds,
-                                Color.White,
-                                0f,
-                                default);
-
+            if (texture != null)
+            {
+                spriteBatch.DrawOnCtrl(this,
+                                    texture,
+                                    bounds,
+                                    SubModule.ModuleIcon.Bounds,
+                                    Color.White,
+                                    0f,
+                                    default);
+            }
         }
 
         protected override void OnClick(MouseEventArgs e)

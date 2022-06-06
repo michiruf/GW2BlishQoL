@@ -103,7 +103,7 @@ namespace Kenedia.Modules.QoL.SubModules
             Container = new CustomFlowPanel()
             {
                 Parent = GameService.Graphics.SpriteScreen,
-                Visible = true,
+                Visible = Active,
                 Width = (int)(tRect.Width + 6 + tRect.Height),
                 HeightSizingMode = SizingMode.AutoSize,
                 FlowDirection = ControlFlowDirection.LeftToRight,
