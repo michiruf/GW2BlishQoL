@@ -49,7 +49,7 @@ namespace Kenedia.Modules.QoL
             Modules = new List<SubModule>()
             {
                 new ItemDestruction(),
-                new SkipCutscenes(),
+                //new SkipCutscenes(),
                 new ZoomOut(),
                 new Resets(),
             };
@@ -238,9 +238,9 @@ namespace Kenedia.Modules.QoL
 
         private void RebuildUI(object sender, EventArgs e)
         {
-            ScreenNotification.ShowNotification("Rebuilding the UI", ScreenNotification.NotificationType.Warning);
-            DisposeUI();
-            CreateUI();
+            //ScreenNotification.ShowNotification("Rebuilding the UI", ScreenNotification.NotificationType.Warning);
+            //DisposeUI();
+            //CreateUI();
         }
 
         private void DisposeUI()

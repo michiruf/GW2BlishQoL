@@ -104,7 +104,8 @@ namespace Kenedia.Modules.QoL.SubModules
             {
                 Parent = GameService.Graphics.SpriteScreen,
                 Visible = Active,
-                Width = (int)(tRect.Width + 6 + tRect.Height),
+                //Width = (int)(tRect.Width + 6 + tRect.Height),
+                WidthSizingMode = SizingMode.AutoSize,
                 HeightSizingMode = SizingMode.AutoSize,
                 FlowDirection = ControlFlowDirection.LeftToRight,
                 Background = QoL.ModuleInstance.TextureManager.getBackground(_Backgrounds.Tooltip),
@@ -174,6 +175,7 @@ namespace Kenedia.Modules.QoL.SubModules
 
             var serverReset = t.Subtract(now);
             ServerReset.Text = string.Format("{0:00}:{1:00}:{2:00}", serverReset.Hours, serverReset.Minutes, serverReset.Seconds);
+
         }
 
         public override void UpdateLanguage(object sender, EventArgs e)
