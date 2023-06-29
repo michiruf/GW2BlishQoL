@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Blish_HUD.Controls.Extern;
 
 namespace Kenedia.Modules.QoL.SubModules
 {
@@ -22,6 +23,7 @@ namespace Kenedia.Modules.QoL.SubModules
         public SettingEntry<Blish_HUD.Input.KeyBinding> ManualMaxZoomOut;
         public SettingEntry<bool> ZoomOnCameraChange;
         public SettingEntry<bool> AllowManualZoom;
+        public SettingEntry<bool> UseHotkeyInsteadOfMouseWheel;
 
         public ZoomOut()
         {
@@ -56,6 +58,10 @@ namespace Kenedia.Modules.QoL.SubModules
                                                       true,
                                                       () => Strings.common.AllowManualZoom_Name,
                                                       () => Strings.common.AllowManualZoom_Tooltip);
+            
+            UseHotkeyInsteadOfMouseWheel = settings.DefineSetting(nameof(AllowManualZoom),
+                true,
+                () => Strings.common.UseHotkeyInsteadOfMouseWheel_Name);
 
             ManualMaxZoomOut.Value.Enabled = true;
             ManualMaxZoomOut.Value.Activated += ManualMaxZoomOut_Triggered;
@@ -153,7 +159,10 @@ namespace Kenedia.Modules.QoL.SubModules
             }
             else if (ZoomTicks > 0)
             {
-                Blish_HUD.Controls.Intern.Mouse.RotateWheel(-25);
+                if(UseHotkeyInsteadOfMouseWheel.Value)
+                    Blish_HUD.Controls.Intern.Keyboard.Press(VirtualKeyShort.NEXT);
+                else
+                    Blish_HUD.Controls.Intern.Mouse.RotateWheel(-25);
                 ZoomTicks -= 1;
             }
 
