@@ -159,8 +159,9 @@ namespace Kenedia.Modules.QoL.SubModules
             }
             else if (ZoomTicks > 0)
             {
-                if(UseHotkeyInsteadOfMouseWheel.Value)
-                    Blish_HUD.Controls.Intern.Keyboard.Press(VirtualKeyShort.NEXT);
+                if (UseHotkeyInsteadOfMouseWheel.Value)
+                    for (var i = 0; i < 100; i++)
+                        Blish_HUD.Controls.Intern.Keyboard.Press(VirtualKeyShort.NEXT);
                 else
                     Blish_HUD.Controls.Intern.Mouse.RotateWheel(-25);
                 ZoomTicks -= 1;
