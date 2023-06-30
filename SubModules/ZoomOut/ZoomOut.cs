@@ -59,7 +59,7 @@ namespace Kenedia.Modules.QoL.SubModules
                                                       () => Strings.common.AllowManualZoom_Name,
                                                       () => Strings.common.AllowManualZoom_Tooltip);
             
-            UseHotkeyInsteadOfMouseWheel = settings.DefineSetting(nameof(AllowManualZoom),
+            UseHotkeyInsteadOfMouseWheel = settings.DefineSetting(nameof(UseHotkeyInsteadOfMouseWheel),
                 true,
                 () => Strings.common.UseHotkeyInsteadOfMouseWheel_Name);
 
@@ -129,52 +129,54 @@ namespace Kenedia.Modules.QoL.SubModules
 
         public override void Update(GameTime gameTime)
         {
-            var Mumble = GameService.Gw2Mumble;
+            var mumble = GameService.Gw2Mumble;
 
-            var cameraDistance = (Math.Max(Mumble.PlayerCamera.Position.Z, Mumble.PlayerCharacter.Position.Z) - Math.Min(Mumble.PlayerCamera.Position.Z, Mumble.PlayerCharacter.Position.Z));
-            var delta = (Math.Max(Distance, cameraDistance) - Math.Min(Distance, cameraDistance));
-            var threshold = AllowManualZoom.Value ? 0.5 : 0.25;
-
-            if (Mumble.UI.IsMapOpen)
+            // Check if mouse movement was present and reset it (always)
+            var mousePreviouslyScrolled = MouseScrolled;
+            MouseScrolled = false;
+            
+            // Cancel early if functionality is disabled
+            // Cancel early if map was opened
+            // Cancel early if mouse was previously scrolled
+            if (
+                !ZoomOnCameraChange.Value ||
+                mumble.UI.IsMapOpen ||
+                (AllowManualZoom.Value && mousePreviouslyScrolled)
+            )
             {
                 ZoomTicks = 0;
                 return;
             }
 
-            if (cameraDistance == Distance) ZoomTicks = ZoomTicks/2;
+            // Calculate distances and delta
+            // I really do not know, why there is just the Z coordinate and not the others. Maybe its oriented and relative to the player?
+            var cameraDistance = Math.Abs(mumble.PlayerCamera.Position.Z - mumble.PlayerCharacter.Position.Z);
+            var delta = Math.Abs(Distance - cameraDistance);
+            var threshold = AllowManualZoom.Value ? 0.5f : 0f;
 
             if (delta > threshold)
             {
-                if (ZoomOnCameraChange.Value && (!AllowManualZoom.Value || !MouseScrolled) && Distance != 0)
-                {
-                    ZoomTicks = 2;
-                }
-                MouseScrolled = false;
-                Distance = cameraDistance;
+                ZoomTicks += 2;
             }
+            Distance = cameraDistance;
 
-            if (Zoom < Mumble.PlayerCamera.FieldOfView)
+            if (Zoom < mumble.PlayerCamera.FieldOfView)
             {
                 ZoomTicks += 2;
             }
-            else if (ZoomTicks > 0)
+            Zoom = mumble.PlayerCamera.FieldOfView;
+
+            // Finally, perform the zooming
+            if (ZoomTicks > 0)
             {
                 if (UseHotkeyInsteadOfMouseWheel.Value)
-                    for (var i = 0; i < 100; i++)
-                        Blish_HUD.Controls.Intern.Keyboard.Press(VirtualKeyShort.NEXT);
+                    Blish_HUD.Controls.Intern.Keyboard.Stroke(VirtualKeyShort.NEXT);
                 else
                     Blish_HUD.Controls.Intern.Mouse.RotateWheel(-25);
                 ZoomTicks -= 1;
             }
-
-
-            Zoom = Mumble.PlayerCamera.FieldOfView;
         }
-        public override void UpdateLanguage(object sender, EventArgs e)
-        {
-            base.UpdateLanguage(sender, e);
-
-        }
+        
         public override void Dispose()
         {
             var Mumble = GameService.Gw2Mumble;
